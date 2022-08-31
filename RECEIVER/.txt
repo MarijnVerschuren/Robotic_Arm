@@ -1,0 +1,25 @@
+// fix all 1 bit errors in the 16 bit operation message
+	this->raw = value; uint8 current_crc = Check::crc_4(this, 0, 12);
+	if (this->data.crc != current_crc) {
+		uint8 i; uint16 buf;
+		for (i = 0; i < 12; i++) {
+			buf = this->raw ^ (0x0001 << i);
+			if (this->data.crc == Check::crc_4(&buf, 0, 12)) { this->raw = buf; return;	}
+		} for (i = 0; i < 4; i++) {
+			buf = this->data.crc ^ (0x1 << i);
+			if (buf == current_crc) { this->data.crc = buf; return;	}
+		} this->data.opcode = OP_CODE::ERROR; this->data.crc = 0x0;
+	}
+
+
+void Buffer::align(const void* const input_buffer, uint64 low_bit, uint64 high_bit, void* const output_buffer, uint64* const len_out) {
+	uint64 len = Util::bitrange_to_bytelen(low_bit, high_bit);
+	if (len_out) { (*len_out) = len; }
+	uint8 low_shift = low_bit % 8;  // shift applied to index i
+	uint8 high_shift = 8 - low_shift;		// shift applied to index 1 + 1
+	// the results from these shift are added together with a bitwise or operation
+	uint64 i = floor(low_bit / 8);  // first index that includes selected data
+	for (uint64 j = i + 1; j < len; i++, j++) {
+		((uint8*)output_buffer)[i] = (((uint8*)input_buffer)[i] << low_shift) | ((uint8*)input_buffer)[j] >> high_shift;
+	} ((uint8*)output_buffer)[i] = (((uint8*)input_buffer)[i] << low_shift) & (0xff << high_shift);
+}

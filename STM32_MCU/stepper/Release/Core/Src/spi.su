@@ -1,0 +1,5 @@
+../Core/Inc/main.h:50:6:MCU_Instruction_reset	0	static
+../Core/Inc/main.h:51:9:MCU_Instruction_bool	0	static
+../Core/Src/spi.c:32:6:MX_SPI1_Init	8	static
+../Core/Src/spi.c:63:6:HAL_SPI_MspInit	48	static
+../Core/Src/spi.c:138:6:HAL_SPI_MspDeInit	8	static
