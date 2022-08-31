@@ -17,13 +17,13 @@
 #define str const char*
 
 #define int8max 0x7f
-#define int8max 0x80
+#define int8min 0x80
 #define uint8max 0xff
 #define int16max 0x7fff
-#define int16max 0x8000
+#define int16min 0x8000
 #define uint16max 0xffff
 #define int32max 0x7fffffff
-#define int32max 0x80000000
+#define int32min 0x80000000
 #define uint32max 0xffffffff
 #define int64max 0x7fffffffffffffff
 #define int64min 0x8000000000000000
