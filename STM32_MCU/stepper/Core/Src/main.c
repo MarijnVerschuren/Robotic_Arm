@@ -85,11 +85,19 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	// all DM connectors are configured in cyclic mode so these functions have to be called once
+
+	/*  DISABLED FOR STEPPER DRIVER TESTING
 	HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)&instruction, 16);  // start data receiving loop
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
+	*/
+
 	// HAL_I2C_Master_Transmit_DMA(hi2c, DevAddress, pData, Size)
+	// TODO: ADD PWM / DIGITAL INPUT FROM AS5600 & ADD PROGRAMMING CAPABILITY <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
 	while (1) {
+		// TODO: FIX STEPPING CODE AND PIN NAMES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if (!MCU_Instruction_bool(&instruction)) { continue; }
 
 		state.job += instruction.steps;
