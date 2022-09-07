@@ -50,6 +50,8 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
+
+
 /* USER CODE END 0 */
 
 /**
@@ -89,6 +91,7 @@ int main(void) {
 	uint64_t	iter			= 0;
 	int8_t		mult			= 0;
 	uint64_t	pulse_delay_us	= 0;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,7 +108,7 @@ int main(void) {
 
 	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
 	instruction.steps = -100000000;
-	instruction.pulse_delay = 100;  // 1us
+	instruction.pulse_delay = 74;
 	instruction.settings.micro_step = 3;
 	instruction.settings.spread_mode = 0;
 
@@ -116,7 +119,7 @@ int main(void) {
 
 		state.job = instruction.steps;
 		pulse_delay_us = instruction.pulse_delay + 1;
-		MCU_Instruction_reset(&instruction);
+		instruction.steps = 0;
 
 		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, state.job > 0);
