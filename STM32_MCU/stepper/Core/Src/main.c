@@ -39,14 +39,13 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void delay_us(uint16_t n) { TIM1->CNT = 0; while(TIM1->CNT < n); }
-void MCU_Instruction_reset(MCU_Instruction* instruction) { instruction->steps = 0; instruction->pulse_delay = 0; }
 uint8_t MCU_Instruction_bool(MCU_Instruction* instruction) { return instruction->steps != 0; }
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
 	switch(instruction->settings.micro_step) {
 	case 0: GPIOA->ODR |= M2; break;
 	case 1: GPIOA->ODR |= M4; break;
-	case 2: GPIOA->ODR |= M8; break;
+	// case 2: GPIOA->ODR |= M8; break;  // default is 1/8 micro stepping
 	case 3: GPIOA->ODR |= M16; break;
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
@@ -57,12 +56,11 @@ void set_motor_setting(MCU_Instruction* instruction) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
-{
+int main(void) {
   /* USER CODE BEGIN 1 */
 	state.pos = 0;  // the current position
 	state.job = 0;  // the future position
-	MCU_Instruction_reset(&instruction);
+	instruction.steps = 0;  // the instruction from master computer
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -116,7 +114,7 @@ int main(void)
 		if (!MCU_Instruction_bool(&instruction)) { continue; }
 		set_motor_setting(&instruction);
 
-		state.job += instruction.steps;
+		state.job = instruction.steps;
 		pulse_delay_us = instruction.pulse_delay + 1;
 		MCU_Instruction_reset(&instruction);
 
