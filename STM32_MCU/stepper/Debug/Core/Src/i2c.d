@@ -1,5 +1,4 @@
-Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o: \
- ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c \
+Core/Src/i2c.o: ../Core/Src/i2c.c ../Core/Inc/i2c.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
  ../Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
@@ -30,6 +29,8 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
+../Core/Inc/i2c.h:
+../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:

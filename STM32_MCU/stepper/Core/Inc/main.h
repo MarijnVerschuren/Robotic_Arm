@@ -35,6 +35,14 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+typedef enum {  // MS2, MS1
+	RST =	0xfe6f,	// 1111 1111 00 11 1111		bit mask to resets M1 and M2
+	M2 =	0x0040,	// 0000 0000 01 00 0000		pin M1 high
+	M4 =	0x0080,	// 0000 0000 10 00 0000		pin M2 high
+	M8 =	0x0000,	// 0000 0000 00 00 0000		both pins low
+	M16 =	0x00b0	// 0000 0000 11 00 0000		both pins high
+} MICRO_STEP;
+
 typedef struct {
 	int64_t pos;
 	int64_t job;
@@ -44,8 +52,9 @@ typedef struct {
 	int64_t steps;
 	uint32_t pulse_delay : 32;  // delay from 1us -> 4295s (1 is added to delay because 0 us is not valid)
 	struct {
-		uint8_t micro_step : 3;  // 0 - 8 calculate setting by using (2 ^ micro_step)
-		uint16_t _ : 13;
+		uint8_t micro_step : 2;  // 0 - 8 (0: MS2, 1: MS4, 2: MS8, 3: MS16)
+		uint8_t spread_mode : 1;  // spread mode flag
+		uint16_t _ : 13;  // reserved
 	} settings;
 	uint16_t crc;  // add crc16?
 } MCU_Instruction;

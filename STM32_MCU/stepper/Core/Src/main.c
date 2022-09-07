@@ -41,6 +41,16 @@ void SystemClock_Config(void);
 void delay_us(uint16_t n) { TIM1->CNT = 0; while(TIM1->CNT < n); }
 void MCU_Instruction_reset(MCU_Instruction* instruction) { instruction->steps = 0; instruction->pulse_delay = 0; }
 uint8_t MCU_Instruction_bool(MCU_Instruction* instruction) { return instruction->steps != 0; }
+void set_motor_setting(MCU_Instruction* instruction) {
+	GPIOA->ODR &= RST;
+	switch(instruction->settings.micro_step) {
+	case 0: GPIOA->ODR |= M2; break;
+	case 1: GPIOA->ODR |= M4; break;
+	case 2: GPIOA->ODR |= M8; break;
+	case 3: GPIOA->ODR |= M16; break;
+	}
+	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
+}
 /* USER CODE END 0 */
 
 /**
@@ -55,7 +65,7 @@ int main(void)
 	MCU_Instruction_reset(&instruction);
   /* USER CODE END 1 */
 
-  /* MCU Configuration-------------------------------------------------------- */
+  /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
@@ -96,28 +106,34 @@ int main(void)
 	// TODO: ADD PWM / DIGITAL INPUT FROM AS5600 & ADD PROGRAMMING CAPABILITY <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
+	instruction.steps = -100000000;
+	instruction.pulse_delay = 100;  // 1us
+	instruction.settings.micro_step = 3;
+	instruction.settings.spread_mode = 0;
+
 	while (1) {
 		// TODO: FIX STEPPING CODE AND PIN NAMES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 		if (!MCU_Instruction_bool(&instruction)) { continue; }
+		set_motor_setting(&instruction);
 
 		state.job += instruction.steps;
 		pulse_delay_us = instruction.pulse_delay + 1;
 		MCU_Instruction_reset(&instruction);
 
-		HAL_GPIO_WritePin(STEPPER_ENA_GPIO_Port, STEPPER_ENA_Pin, 1);
+		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, state.job > 0);
 		// capture the current job (this can change via interrupt)
 		mult = state.job > 0 ? 1 : -1;
 		iter = abs_64(state.job);
 		for (uint64_t i = 0; i < iter; i++) {  // iterate this job for max 4096 iterations at the time before SPI receive
-			HAL_GPIO_WritePin(STEPPER_CLK_GPIO_Port, STEPPER_CLK_Pin, 1);
+			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
 			delay_us(pulse_delay_us);
-			HAL_GPIO_WritePin(STEPPER_CLK_GPIO_Port, STEPPER_CLK_Pin, 0);
+			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
 			delay_us(pulse_delay_us);
 			state.pos += mult;
 			state.job -= mult;
 		}
-		HAL_GPIO_WritePin(STEPPER_ENA_GPIO_Port, STEPPER_ENA_Pin, 0);
+		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
