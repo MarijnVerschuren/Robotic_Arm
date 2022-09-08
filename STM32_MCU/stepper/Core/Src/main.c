@@ -39,7 +39,6 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void delay_us(uint16_t n) { TIM1->CNT = 0; while(TIM1->CNT < n); }
-uint8_t MCU_Instruction_bool(MCU_Instruction* instruction) { return instruction->steps != 0; }
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
 	switch(instruction->settings.micro_step) {
@@ -108,13 +107,13 @@ int main(void) {
 
 	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
 	instruction.steps = -100000000;
-	instruction.pulse_delay = 74;
+	instruction.pulse_delay = 74;  // safe operating range is from 75us and up
 	instruction.settings.micro_step = 3;
 	instruction.settings.spread_mode = 0;
 
 	while (1) {
 		// TODO: FIX STEPPING CODE AND PIN NAMES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-		if (!MCU_Instruction_bool(&instruction)) { continue; }
+		if (instruction->steps == 0) { continue; }
 		set_motor_setting(&instruction);
 
 		state.job = instruction.steps;
@@ -127,12 +126,13 @@ int main(void) {
 		mult = state.job > 0 ? 1 : -1;
 		iter = abs_64(state.job);
 		for (uint64_t i = 0; i < iter; i++) {  // iterate this job for max 4096 iterations at the time before SPI receive
+			// update variables first because the SPI DMA transmit has a almost 100% chance to happen during pulse delay
+			state.pos += mult;
+			state.job -= mult;
 			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
 			delay_us(pulse_delay_us);
 			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
 			delay_us(pulse_delay_us);
-			state.pos += mult;
-			state.job -= mult;
 		}
 		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
     /* USER CODE END WHILE */
