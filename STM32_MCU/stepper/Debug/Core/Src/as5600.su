@@ -13,5 +13,5 @@
 ../Core/Src/as5600.c:544:19:AS5600_GetRawAngle	32	static
 ../Core/Src/as5600.c:557:19:AS5600_GetAngle	32	static
 ../Core/Src/as5600.c:571:19:AS5600_GetMagnetStatus	32	static
-../Core/Src/as5600.c:583:19:AS5600_GetAGCSetting	32	static
-../Core/Src/as5600.c:593:19:AS5600_GetCORDICMagnitude	32	static
+../Core/Src/as5600.c:582:19:AS5600_GetAGCSetting	32	static
+../Core/Src/as5600.c:592:19:AS5600_GetCORDICMagnitude	32	static

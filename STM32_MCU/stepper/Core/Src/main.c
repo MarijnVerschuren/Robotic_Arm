@@ -101,6 +101,13 @@ int main(void)
 
 	// initialize AS5600 sensor
 
+
+	// TODO: https://community.st.com/s/question/0D53W000007Wj9wSAC/hali2c-hangs-when-it-enters-i2cwaitonflaguntiltimeout-function
+	// above link to exact problem
+	while (1) {
+		HAL_I2C_Master_Transmit(&hi2c1, (0x36 << 1), AS5600_REGISTER_AGC, I2C_MEMADD_SIZE_8BIT, 1);
+		//HAL_GPIO_TogglePin(SENSOR_DIR_GPIO_Port, SENSOR_DIR_Pin);
+	}
 	while (AS5600_Init(sensor) == HAL_ERROR) {}  // the sensor has to be on for the code to work
   /* USER CODE END 2 */
 
