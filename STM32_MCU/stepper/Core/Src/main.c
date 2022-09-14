@@ -29,6 +29,7 @@
 /* USER CODE BEGIN PV */
 MCU_State state;  // structure that contains the current state of important variables
 MCU_Instruction instruction;
+AS5600_TypeDef* sensor;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,11 +58,18 @@ void set_motor_setting(MCU_Instruction* instruction) {
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) {
+int main(void)
+{
   /* USER CODE BEGIN 1 */
-	state.pos = 0;  // the current position
-	state.job = 0;  // the future position
-	instruction.steps = 0;  // the instruction from master computer
+	state.pos = 0;							// the current position
+	state.job = 0;							// the future position
+	instruction.steps = 0;					// the instruction from master computer
+
+	sensor = AS5600_New();
+	sensor->i2cHandle = &hi2c1;
+	sensor->i2cAddr = 0x36;
+	sensor->DirPort = SENSOR_DIR_GPIO_Port;
+	sensor->DirPin = SENSOR_DIR_Pin;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -91,6 +99,9 @@ int main(void) {
 	int8_t		mult			= 0;
 	uint64_t	pulse_delay_us	= 0;
 
+	// initialize AS5600 sensor
+
+	while (AS5600_Init(sensor) == HAL_ERROR) {}  // the sensor has to be on for the code to work
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -107,13 +118,12 @@ int main(void) {
 
 	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
 	instruction.steps = -100000000;
-	instruction.pulse_delay = 74;  // safe operating range is from 75us and up
+	instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
 	instruction.settings.micro_step = 3;
 	instruction.settings.spread_mode = 0;
 
 	while (1) {
-		// TODO: FIX STEPPING CODE AND PIN NAMES <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-		if (instruction->steps == 0) { continue; }
+		if (instruction.steps == 0) { continue; }
 		set_motor_setting(&instruction);
 
 		state.job = instruction.steps;

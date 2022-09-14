@@ -31,12 +31,13 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "as5600.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 typedef enum {  // MS2, MS1
-	RST =	0xfe6f,	// 1111 1111 00 11 1111		bit mask to resets M1 and M2
+	RST =	0xfe6f,	// 1111 1111 00 11 1111		bit mask to reset M1 and M2
 	M2 =	0x0040,	// 0000 0000 01 00 0000		pin M1 high
 	M4 =	0x0080,	// 0000 0000 10 00 0000		pin M2 high
 	M8 =	0x0000,	// 0000 0000 00 00 0000		both pins low
@@ -50,7 +51,7 @@ typedef struct {
 
 typedef struct {
 	int64_t steps;
-	uint32_t pulse_delay : 32;  // delay from 1us -> 4295s (1 is added to delay because 0 us is not valid)
+	uint32_t pulse_delay;  // delay from 1us -> 4295s (1 is added to delay because 0 us is not valid)
 	struct {
 		uint8_t micro_step : 2;  // 0 - 8 (0: MS2, 1: MS4, 2: MS8, 3: MS16)
 		uint8_t spread_mode : 1;  // spread mode flag
@@ -64,6 +65,7 @@ typedef struct {
 /* USER CODE BEGIN EC */
 extern MCU_State state;
 extern MCU_Instruction instruction;
+extern AS5600_TypeDef* sensor;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -77,7 +79,8 @@ extern MCU_Instruction instruction;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void delay(uint16_t n);
+void set_motor_setting(MCU_Instruction* instruction);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -101,10 +104,12 @@ void Error_Handler(void);
 #define STEPPER_MS2_GPIO_Port GPIOA
 #define STEPPER_MS1_Pin GPIO_PIN_9
 #define STEPPER_MS1_GPIO_Port GPIOA
-#define SCL_Pin GPIO_PIN_6
-#define SCL_GPIO_Port GPIOB
-#define SDA_Pin GPIO_PIN_7
-#define SDA_GPIO_Port GPIOB
+#define SENSOR_DIR_Pin GPIO_PIN_5
+#define SENSOR_DIR_GPIO_Port GPIOB
+#define SENSOR_SCL_Pin GPIO_PIN_6
+#define SENSOR_SCL_GPIO_Port GPIOB
+#define SENSOR_SDA_Pin GPIO_PIN_7
+#define SENSOR_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

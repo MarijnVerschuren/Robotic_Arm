@@ -571,6 +571,7 @@ HAL_StatusTypeDef AS5600_GetAngle(AS5600_TypeDef *const a,
 HAL_StatusTypeDef AS5600_GetMagnetStatus(AS5600_TypeDef *const a,
                                          uint8_t *const stat) {
     HAL_StatusTypeDef status = HAL_OK;
+    while(a->i2cHandle->State == HAL_I2C_STATE_BUSY_TX) {}  // this halts the code
     if (HAL_I2C_Mem_Read_IT(a->i2cHandle, a->i2cAddr, AS5600_REGISTER_STATUS,
                             I2C_MEMADD_SIZE_8BIT, stat, 1) != HAL_OK) {
         status = HAL_ERROR;
