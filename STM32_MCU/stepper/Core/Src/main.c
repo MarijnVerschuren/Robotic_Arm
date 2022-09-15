@@ -50,8 +50,6 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
-
-
 /* USER CODE END 0 */
 
 /**
@@ -93,6 +91,7 @@ int main(void)
   MX_TIM1_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
+	// __HAL_RCC_I2C1_CLK_ENABLE();
 	HAL_TIM_Base_Start(&htim1);  // start timer_1
 	// buffers
 	uint64_t	iter			= 0;
@@ -103,11 +102,12 @@ int main(void)
 
 
 	// TODO: https://community.st.com/s/question/0D53W000007Wj9wSAC/hali2c-hangs-when-it-enters-i2cwaitonflaguntiltimeout-function
-	// above link to exact problem
-	while (1) {
-		HAL_I2C_Master_Transmit(&hi2c1, (0x36 << 1), AS5600_REGISTER_AGC, I2C_MEMADD_SIZE_8BIT, 1);
-		//HAL_GPIO_TogglePin(SENSOR_DIR_GPIO_Port, SENSOR_DIR_Pin);
-	}
+	// above link doesnt seem to work
+	// TODO: https://electronics.stackexchange.com/questions/272427/stm32-busy-flag-is-set-after-i2c-initialization
+	// TODO: https://www.youtube.com/watch?v=TqUzQfMGlfI   // 10 min
+	// TODO: https://www.youtube.com/watch?v=ZVeG25cMe58
+	// hi2c1.Instance->SR1 |= 0x8000;  // set the software reset bit  // didnt work either :(((((
+	// TODO TODO: DMA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 	while (AS5600_Init(sensor) == HAL_ERROR) {}  // the sensor has to be on for the code to work
   /* USER CODE END 2 */
 
