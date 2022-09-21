@@ -88,10 +88,9 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_SPI1_Init();
-  MX_TIM1_Init();
   MX_I2C1_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-	// __HAL_RCC_I2C1_CLK_ENABLE();
 	HAL_TIM_Base_Start(&htim1);  // start timer_1
 	// buffers
 	uint64_t	iter			= 0;
@@ -108,7 +107,27 @@ int main(void)
 	// TODO: https://www.youtube.com/watch?v=ZVeG25cMe58
 	// hi2c1.Instance->SR1 |= 0x8000;  // set the software reset bit  // didnt work either :(((((
 	// TODO TODO: DMA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	while (AS5600_Init(sensor) == HAL_ERROR) {}  // the sensor has to be on for the code to work
+
+	//HAL_I2C_MspInit(&hi2c1);
+	//HAL_I2C_DeInit(&hi2c1);
+	//HAL_I2C_Init(&hi2c1);
+
+	__HAL_RCC_I2C1_FORCE_RESET();
+	HAL_Delay(2);
+	__HAL_RCC_I2C1_RELEASE_RESET();
+
+	uint8_t a;
+	a = __HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_BUSY) != RESET;
+	__HAL_I2C_CLEAR_FLAG(&hi2c1, I2C_FLAG_BUSY);
+	hi2c1.Instance->SR1 ^= I2C_FLAG_BUSY;
+	hi2c1.Instance->SR2 ^= I2C_FLAG_BUSY;
+	a = __HAL_I2C_GET_FLAG(&hi2c1, I2C_FLAG_BUSY) != RESET;
+
+	while (AS5600_Init(sensor) == HAL_ERROR) {
+		HAL_GPIO_TogglePin(SENSOR_DIR_GPIO_Port, SENSOR_DIR_Pin);
+	}  // the sensor has to be on for the code to work
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

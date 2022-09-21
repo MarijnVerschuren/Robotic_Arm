@@ -221,6 +221,7 @@ HAL_StatusTypeDef AS5600_Init(AS5600_TypeDef *a) {
             status = HAL_ERROR;
             return status;
     }
+
     if (HAL_I2C_Mem_Write_IT(a->i2cHandle, a->i2cAddr,
                              AS5600_REGISTER_CONF_HIGH, I2C_MEMADD_SIZE_8BIT,
                              a->confRegister, 2) != HAL_OK) {
