@@ -25,6 +25,8 @@
 
 /* Private variables ---------------------------------------------------------*/
  I2C_HandleTypeDef hi2c1;
+DMA_HandleTypeDef hdma_i2c1_rx;
+DMA_HandleTypeDef hdma_i2c1_tx;
 
 UART_HandleTypeDef huart2;
 
@@ -36,6 +38,7 @@ UART_HandleTypeDef huart2;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -75,6 +78,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
+  MX_DMA_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
 
@@ -83,8 +87,10 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   uint8_t data[2] = {0x45, 0x21};
+  HAL_I2C_Master_Transmit_DMA(&hi2c1, 0x36, data, 2);
   while (1) {
 	  HAL_I2C_Master_Transmit(&hi2c1, 0x36, data, 2, HAL_MAX_DELAY);
+	  HAL_I2C_Master_Transmit_IT(&hi2c1, 0x36, data, 2);
 	  // HAL_I2C_Mem_Write(&hi2c1, 0x36, 0x03, I2C_MEMADD_SIZE_8BIT, data, 2, HAL_MAX_DELAY);
     /* USER CODE END WHILE */
 
@@ -204,6 +210,25 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA1_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA1_Stream0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream0_IRQn);
+  /* DMA1_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
 
 }
 
