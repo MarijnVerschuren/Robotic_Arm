@@ -108,7 +108,10 @@ int main(void)
 	// TODO: https://www.youtube.com/watch?v=ZVeG25cMe58
 	// hi2c1.Instance->SR1 |= 0x8000;  // set the software reset bit  // didnt work either :(((((
 	// TODO TODO: DMA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
+	// https://www.reddit.com/r/stm32f4/comments/pf0d1b/i2c_target_device_is_always_busy/
+	/*
+	 * If you have no logic analyzer/scope you could use a voltmeter to make sure your lines when idle are high and not low. Low on either when there's no I2C traffic is a bad sign and I wouldn't expect anything to work.
+	 * */
 	//HAL_I2C_MspInit(&hi2c1);
 	//HAL_I2C_DeInit(&hi2c1);
 	//HAL_I2C_Init(&hi2c1);
