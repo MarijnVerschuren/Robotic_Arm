@@ -1,0 +1,2 @@
+TMC5160 Pro	(motor driver)
+A1333		(HAL sensor)
