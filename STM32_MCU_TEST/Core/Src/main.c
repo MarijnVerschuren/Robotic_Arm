@@ -93,13 +93,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
   uint8_t buffer[3] = {0x12, 0x34, 0x56};
 
-  while (1) {
+  /*while (1) {
 	  HAL_I2C_Master_Transmit(&hi2c1, sensor->i2cAddr, buffer, 3, 100);
 	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	  // https://electronics.stackexchange.com/questions/454825/stm32-i2c-transmitting-no-data-and-cannot-change-the-data-that-is-being-transmit
 	  // NO ACK IS SENT FROM IC SO NO DATA IS TRANSMITTED
 	  // CONFIG I2C WITH 5V <<<<<
-  }
+  }*/
 	while (AS5600_Init(sensor) != HAL_OK) {
 	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	  HAL_Delay(50);
