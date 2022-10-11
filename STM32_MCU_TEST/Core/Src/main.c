@@ -91,7 +91,9 @@ int main(void)
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-	while (AS5600_Init(sensor) != HAL_OK) {
+  uint8_t code = HAL_ERROR;
+  while (code != HAL_OK) {
+	  code = AS5600_Init(sensor);
 	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	  HAL_Delay(50);
 	}

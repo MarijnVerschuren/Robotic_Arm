@@ -229,11 +229,15 @@ HAL_StatusTypeDef AS5600_Init(AS5600_TypeDef *a) {
         return status;
     }
 
+    HAL_Delay(5);
+
     /* Check magnet status */
     if (AS5600_GetMagnetStatus(a, &mag_status) != HAL_OK) {
         status = HAL_ERROR;
         return status;
     }
+
+    HAL_Delay(5);
 
     if (!(mag_status & AS5600_MAGNET_DETECTED)) {
         /* Magnet not detected */
