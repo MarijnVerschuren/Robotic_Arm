@@ -67,7 +67,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 	AS5600_TypeDef* sensor = AS5600_new();
 	sensor->i2c_handle = &hi2c1;
-	sensor->dir_port = LED_GPIO_Port;
+	sensor->dir_port = LED_GPIO_Port;  // LED?????
 	sensor->dir_pin = LED_Pin;
 	// https://forum.digikey.com/t/as5600-angle-magnetic-sensor-analog-out-problem/3325/3
 	/// SOLUTION: remove resistor R4 from breakout
