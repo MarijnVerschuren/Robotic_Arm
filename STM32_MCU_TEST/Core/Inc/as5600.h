@@ -137,7 +137,7 @@ LICENSE:
 #define AS5600_WATCHDOG_DEFAULT AS5600_WATCHDOG_ON
 /* AS5600 Status Definitions */
 #define AS5600_AGC_MIN_GAIN_OVERFLOW                                           \
-    (uint8_t)(1UL << 3) /*Error bit indicates b-field is too string */
+    (uint8_t)(1UL << 3) /*Error bit indicates b-field is too strong */
 #define AS5600_AGC_MAX_GAIN_OVERFLOW                                           \
     (uint8_t)(1UL << 4) /*Error bit indicates b-field is too weak */
 #define AS5600_MAGNET_DETECTED                                                 \
