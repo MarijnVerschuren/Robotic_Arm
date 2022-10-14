@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "as5600.h"
+#include "AS5600.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

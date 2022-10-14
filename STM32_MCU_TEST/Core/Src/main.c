@@ -55,7 +55,7 @@ static void MX_I2C1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint16_t angle;
 /* USER CODE END 0 */
 
 /**
@@ -65,11 +65,12 @@ static void MX_I2C1_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	AS5600_TypeDef* sensor = AS5600_New();
-	sensor->i2cHandle = &hi2c1;
-	sensor->i2cAddr = 0x36 << 1;
-	sensor->DirPort = LED_GPIO_Port;
-	sensor->DirPin = LED_Pin;
+	AS5600_TypeDef* sensor = AS5600_new();
+	sensor->i2c_handle = &hi2c1;
+	sensor->dir_port = LED_GPIO_Port;
+	sensor->dir_pin = LED_Pin;
+	// https://forum.digikey.com/t/as5600-angle-magnetic-sensor-analog-out-problem/3325/3
+	/// SOLUTION: remove resistor R4 from breakout
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -84,19 +85,16 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-  uint8_t code = HAL_ERROR;
-  while (code != HAL_OK) {
-	  code = AS5600_Init(sensor);
+  while (AS5600_init(sensor) != HAL_OK) {
 	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	  HAL_Delay(50);
-	}
+  }
 
   /* USER CODE END 2 */
 
@@ -104,10 +102,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	  HAL_Delay(500);
     /* USER CODE END WHILE */
-
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
