@@ -57,8 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define AS5600_ANALOG_IN_Pin GPIO_PIN_0
+#define AS5600_ANALOG_IN_GPIO_Port GPIOA
 #define LED_Pin GPIO_PIN_5
 #define LED_GPIO_Port GPIOA
+#define AS5600_DIR_Pin GPIO_PIN_9
+#define AS5600_DIR_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
