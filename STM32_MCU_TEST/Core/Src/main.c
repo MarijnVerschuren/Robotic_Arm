@@ -45,9 +45,9 @@ DMA_HandleTypeDef hdma_adc1;
 
 I2C_HandleTypeDef hi2c1;
 
-uint32_t adc_now;
-uint32_t adc_delay[100];
-uint8_t adc_delay_index = 0;
+uint16_t adc_min[32];
+uint16_t adc_max[32];
+uint16_t adc_dif[32];
 
 /* USER CODE BEGIN PV */
 
@@ -111,7 +111,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  adc_now = HAL_GetTick();
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)angle_data, ADC_IN_BUFFER_SIZE);
   while (1)
   {
@@ -310,24 +309,17 @@ static void MX_GPIO_Init(void)
 /// CALLBACKS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 /// TODO: measure fill times
 void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
-	if (adc_delay_index < 100) {
-		uint32_t now = HAL_GetTick();
-		adc_delay[adc_delay_index] = now - adc_now;
-		adc_now = now;
-		adc_delay_index++;
-		return;
-	}
-	return;
 }
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-	if (adc_delay_index < 100) {
-		uint32_t now = HAL_GetTick();
-		adc_delay[adc_delay_index] = now - adc_now;
-		adc_now = now;
-		adc_delay_index++;
-		return;
+	for (uint16_t i = 0; i < 32; i++) {
+		adc_min[i] = angle_data[i * 128];
+		adc_max[i] = angle_data[i * 128];
+		for (uint16_t j = 0; j < 128; j++) {
+			if (angle_data[i * 128 + j] < adc_min[i]) { adc_min[i] = angle_data[i * 128 + j]; }
+			if (angle_data[i * 128 + j] > adc_max[i]) { adc_max[i] = angle_data[i * 128 + j]; }
+		}
+		adc_dif[i] = adc_max[i] - adc_min[i];
 	}
-	return;
 }
 /* USER CODE END 4 */
 
