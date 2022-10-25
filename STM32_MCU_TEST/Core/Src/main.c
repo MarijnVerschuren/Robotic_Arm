@@ -31,7 +31,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define ADC_IN_BUFFER_SIZE 4096
+// the size of the array is determined by the time to fill in this case it is filled at 70KHz
+#define AS5600_ADC_BUF_SIZE 19
+// the delta_t_div_tau variable is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
+#define AS5600_EULER_DELTA_T_DIV_TAU 3
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -40,14 +43,9 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
-
 I2C_HandleTypeDef hi2c1;
-
-uint16_t adc_min[32];
-uint16_t adc_max[32];
-uint16_t adc_dif[32];
 
 /* USER CODE BEGIN PV */
 
@@ -60,12 +58,14 @@ static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint16_t euler_integration(double* pos_integrator);	// uses [AS5600_analog_pos] and updates [pos]
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t angle_data[ADC_IN_BUFFER_SIZE];
+uint16_t AS5600_analog_pos[AS5600_ADC_BUF_SIZE];
+double AS5600_pos_integrator;
+uint16_t AS5600_pos;
 /* USER CODE END 0 */
 
 /**
@@ -107,17 +107,22 @@ int main(void)
 	  HAL_Delay(50);
   }
 
+  // Get the real angle in the slow way so that the euler-integration can work with it
+  AS5600_get_angle(sensor, &AS5600_pos);
+  AS5600_pos_integrator = AS5600_pos;
   /* USER CODE END 2 */
 
   /* Infinite loop */
+
   /* USER CODE BEGIN WHILE */
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t*)angle_data, ADC_IN_BUFFER_SIZE);
-  while (1)
-  {
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)AS5600_analog_pos, AS5600_ADC_BUF_SIZE);
+	while (1)
+	{
+		AS5600_pos = euler_integration(&AS5600_pos_integrator);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -188,7 +193,7 @@ static void MX_ADC1_Init(void)
   /** Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion)
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV6;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
   hadc1.Init.ScanConvMode = DISABLE;
   hadc1.Init.ContinuousConvMode = ENABLE;
@@ -306,20 +311,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-/// CALLBACKS <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-/// TODO: measure fill times
-void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef* hadc) {
-}
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-	for (uint16_t i = 0; i < 32; i++) {
-		adc_min[i] = angle_data[i * 128];
-		adc_max[i] = angle_data[i * 128];
-		for (uint16_t j = 0; j < 128; j++) {
-			if (angle_data[i * 128 + j] < adc_min[i]) { adc_min[i] = angle_data[i * 128 + j]; }
-			if (angle_data[i * 128 + j] > adc_max[i]) { adc_max[i] = angle_data[i * 128 + j]; }
-		}
-		adc_dif[i] = adc_max[i] - adc_min[i];
+uint16_t euler_integration(double* pos_integrator) {
+	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
+		(*pos_integrator) += (AS5600_analog_pos[i] - (*pos_integrator)) / AS5600_EULER_DELTA_T_DIV_TAU;
 	}
+	return round(*pos_integrator);
 }
 /* USER CODE END 4 */
 

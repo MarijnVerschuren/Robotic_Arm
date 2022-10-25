@@ -1,9 +1,8 @@
-../Core/Src/main.c:75:5:main	16	static
-../Core/Src/main.c:128:6:SystemClock_Config	88	static
-../Core/Src/main.c:175:13:MX_ADC1_Init	24	static
-../Core/Src/main.c:227:13:MX_I2C1_Init	8	static
-../Core/Src/main.c:259:13:MX_DMA_Init	16	static
-../Core/Src/main.c:277:13:MX_GPIO_Init	40	static
-../Core/Src/main.c:311:6:HAL_ADC_ConvHalfCpltCallback	16	static
-../Core/Src/main.c:313:6:HAL_ADC_ConvCpltCallback	24	static
-../Core/Src/main.c:330:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:73:5:main	16	static
+../Core/Src/main.c:131:6:SystemClock_Config	88	static
+../Core/Src/main.c:178:13:MX_ADC1_Init	24	static
+../Core/Src/main.c:230:13:MX_I2C1_Init	8	static
+../Core/Src/main.c:262:13:MX_DMA_Init	16	static
+../Core/Src/main.c:280:13:MX_GPIO_Init	40	static
+../Core/Src/main.c:312:10:euler_integration	32	static
+../Core/Src/main.c:324:6:Error_Handler	4	static,ignoring_inline_asm
