@@ -66,6 +66,10 @@ typedef struct {
 extern MCU_State state;
 extern MCU_Instruction instruction;
 extern AS5600_TypeDef* sensor;
+
+extern uint16_t AS5600_analog_pos[AS5600_ADC_BUF_SIZE];
+extern double AS5600_pos_integrator;
+extern uint16_t AS5600_pos;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -73,6 +77,7 @@ extern AS5600_TypeDef* sensor;
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 #define abs_64(x) (x > 0) ? x : (uint64_t)x
+#define round(x) ((x) > ((int64_t)(x))) ? (((int64_t)(x)) + 1) : ((int64_t)(x))
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -84,6 +89,8 @@ void set_motor_setting(MCU_Instruction* instruction);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define AS5600_ANALOG_IN_Pin GPIO_PIN_0
+#define AS5600_ANALOG_IN_GPIO_Port GPIOA
 #define NSS_Pin GPIO_PIN_4
 #define NSS_GPIO_Port GPIOA
 #define SCK_Pin GPIO_PIN_5

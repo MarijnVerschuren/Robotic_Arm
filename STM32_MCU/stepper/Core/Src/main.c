@@ -3,6 +3,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "dma.h"
 #include "i2c.h"
 #include "spi.h"
@@ -19,6 +20,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// the size of the array is determined by the time to fill in this case it is filled at 70KHz
+#define AS5600_ADC_BUF_SIZE 19
+// the delta_t_div_tau variable is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
+#define AS5600_EULER_DELTA_T_DIV_TAU 3
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -31,6 +36,10 @@
 MCU_State state;  // structure that contains the current state of important variables
 MCU_Instruction instruction;
 AS5600_TypeDef* sensor;
+
+uint16_t AS5600_analog_pos[AS5600_ADC_BUF_SIZE];
+double AS5600_pos_integrator;
+uint16_t AS5600_pos;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -51,6 +60,12 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
+uint16_t euler_integration(double* pos_integrator) {
+	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
+		(*pos_integrator) += (AS5600_analog_pos[i] - (*pos_integrator)) / AS5600_EULER_DELTA_T_DIV_TAU;
+	}
+	return round(*pos_integrator);
+}
 /* USER CODE END 0 */
 
 /**
@@ -64,11 +79,11 @@ int main(void)
 	state.job = 0;							// the future position
 	instruction.steps = 0;					// the instruction from master computer
 
-	sensor = AS5600_New();
-	sensor->i2cHandle = &hi2c1;
-	sensor->i2cAddr = 0x36;
-	sensor->DirPort = SENSOR_DIR_GPIO_Port;
-	sensor->DirPin = SENSOR_DIR_Pin;
+	sensor = AS5600_new();
+	sensor->i2c_handle = &hi2c1;
+	sensor->dir_port = AS5600_DIR_GPIO_Port;
+	sensor->dir_pin = AS5600_DIR_Pin;
+	sensor->positive_rotation_direction = AS5600_DIR_CCW;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -91,6 +106,7 @@ int main(void)
   MX_SPI1_Init();
   MX_TIM1_Init();
   MX_I2C1_Init();
+  MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start(&htim1);  // start timer_1
 	// buffers
@@ -99,46 +115,30 @@ int main(void)
 	uint64_t	pulse_delay_us	= 0;
 
 	// initialize AS5600 sensor
-
-
-	// TODO: https://community.st.com/s/question/0D53W000007Wj9wSAC/hali2c-hangs-when-it-enters-i2cwaitonflaguntiltimeout-function
-	// above link doesnt seem to work
-	// TODO: https://electronics.stackexchange.com/questions/272427/stm32-busy-flag-is-set-after-i2c-initialization
-	// TODO: https://www.youtube.com/watch?v=TqUzQfMGlfI   // 10 min
-	// TODO: https://www.youtube.com/watch?v=ZVeG25cMe58
-	// hi2c1.Instance->SR1 |= 0x8000;  // set the software reset bit  // didnt work either :(((((
-	// TODO TODO: DMA <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-	// https://www.reddit.com/r/stm32f4/comments/pf0d1b/i2c_target_device_is_always_busy/
-	/*
-	 * If you have no logic analyzer/scope you could use a voltmeter to make sure your lines when idle are high and not low. Low on either when there's no I2C traffic is a bad sign and I wouldn't expect anything to work.
-	 * */
-	//HAL_I2C_MspInit(&hi2c1);
-	//HAL_I2C_DeInit(&hi2c1);
-	//HAL_I2C_Init(&hi2c1);
-
-	// force reset (doesnt work?)
-	__HAL_RCC_I2C1_FORCE_RESET(); HAL_Delay(2); __HAL_RCC_I2C1_RELEASE_RESET();
-
 	while (AS5600_Init(sensor) == HAL_ERROR) {
 		HAL_GPIO_TogglePin(SENSOR_DIR_GPIO_Port, SENSOR_DIR_Pin);
 	}  // the sensor has to be on for the code to work
 
 
+	AS5600_get_angle(sensor, &AS5600_pos);
+	AS5600_pos_integrator = AS5600_pos;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	// all DM connectors are configured in cyclic mode so these functions have to be called once
 
+	// all DMA connectors are configured in cyclic mode so these functions have to be called once
 	/*  DISABLED FOR STEPPER DRIVER TESTING
 	HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)&instruction, 16);  // start data receiving loop
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)AS5600_analog_pos, AS5600_ADC_BUF_SIZE);
 
-	// HAL_I2C_Master_Transmit_DMA(hi2c, DevAddress, pData, Size)
-	// TODO: ADD PWM / DIGITAL INPUT FROM AS5600 & ADD PROGRAMMING CAPABILITY <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	while (1) {
+		AS5600_pos = euler_integration(&AS5600_pos_integrator);
+		// TODO: add the pos variable to the status struct
+	}
 
-	// some pin names have changed <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< (also add i2c support for mae(magnetic angle encoder) idealy with dma)
 	instruction.steps = -100000000;
 	instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
 	instruction.settings.micro_step = 3;
