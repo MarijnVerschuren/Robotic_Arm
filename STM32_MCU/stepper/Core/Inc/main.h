@@ -31,6 +31,8 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#define AS5600_ADC_BUF_SIZE 19
+
 #include "as5600.h"
 /* USER CODE END Includes */
 
@@ -111,12 +113,12 @@ void set_motor_setting(MCU_Instruction* instruction);
 #define STEPPER_MS2_GPIO_Port GPIOA
 #define STEPPER_MS1_Pin GPIO_PIN_9
 #define STEPPER_MS1_GPIO_Port GPIOA
-#define SENSOR_DIR_Pin GPIO_PIN_5
-#define SENSOR_DIR_GPIO_Port GPIOB
-#define SENSOR_SCL_Pin GPIO_PIN_6
-#define SENSOR_SCL_GPIO_Port GPIOB
-#define SENSOR_SDA_Pin GPIO_PIN_7
-#define SENSOR_SDA_GPIO_Port GPIOB
+#define AS5600_DIR_Pin GPIO_PIN_5
+#define AS5600_DIR_GPIO_Port GPIOB
+#define AS5600_SCL_Pin GPIO_PIN_6
+#define AS5600_SCL_GPIO_Port GPIOB
+#define AS5600_SDA_Pin GPIO_PIN_7
+#define AS5600_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

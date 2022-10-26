@@ -1,5 +1,6 @@
-../Core/Src/main.c:43:6:delay_us	16	static
-../Core/Src/main.c:44:6:set_motor_setting	16	static
-../Core/Src/main.c:60:5:main	88	static
+../Core/Src/main.c:52:6:delay_us	16	static
+../Core/Src/main.c:53:6:set_motor_setting	16	static
+../Core/Src/main.c:63:10:euler_integration	32	static
+../Core/Src/main.c:75:5:main	32	static
 ../Core/Src/main.c:181:6:SystemClock_Config	88	static
 ../Core/Src/main.c:230:6:Error_Handler	4	static

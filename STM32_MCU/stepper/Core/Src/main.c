@@ -115,8 +115,8 @@ int main(void)
 	uint64_t	pulse_delay_us	= 0;
 
 	// initialize AS5600 sensor
-	while (AS5600_Init(sensor) == HAL_ERROR) {
-		HAL_GPIO_TogglePin(SENSOR_DIR_GPIO_Port, SENSOR_DIR_Pin);
+	while (AS5600_init(sensor) != HAL_OK) {
+		  HAL_Delay(50);
 	}  // the sensor has to be on for the code to work
 
 
