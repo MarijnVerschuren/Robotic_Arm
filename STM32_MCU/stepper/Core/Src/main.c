@@ -134,13 +134,8 @@ int main(void)
 	*/
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)AS5600_analog_pos, AS5600_ADC_BUF_SIZE);
 
-	while (1) {
-		AS5600_pos = euler_integration(&AS5600_pos_integrator);
-		// TODO: add the pos variable to the status struct
-	}
-
 	instruction.steps = -100000000;
-	instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
+	instruction.pulse_delay = 474; // 74;  // safe operating range is from 75us and up
 	instruction.settings.micro_step = 3;
 	instruction.settings.spread_mode = 0;
 
@@ -165,6 +160,7 @@ int main(void)
 			delay_us(pulse_delay_us);
 			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
 			delay_us(pulse_delay_us);
+			AS5600_pos = euler_integration(&AS5600_pos_integrator);
 		}
 		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
     /* USER CODE END WHILE */

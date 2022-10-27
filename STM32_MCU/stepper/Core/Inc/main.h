@@ -119,6 +119,8 @@ void set_motor_setting(MCU_Instruction* instruction);
 #define AS5600_SCL_GPIO_Port GPIOB
 #define AS5600_SDA_Pin GPIO_PIN_7
 #define AS5600_SDA_GPIO_Port GPIOB
+#define __Pin GPIO_PIN_9
+#define __GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
