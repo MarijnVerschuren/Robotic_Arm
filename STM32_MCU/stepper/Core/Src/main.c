@@ -20,10 +20,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// the size of the array is determined by the time to fill in this case it is filled at 70KHz
-#define AS5600_ADC_BUF_SIZE 19
-// the delta_t_div_tau variable is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
-#define AS5600_EULER_DELTA_T_DIV_TAU 3
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,7 +45,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void delay_us(uint16_t n) { TIM1->CNT = 0; while(TIM1->CNT < n); }
+void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
+void wait_until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
 	switch(instruction->settings.micro_step) {
@@ -60,11 +57,21 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
+/*
 uint16_t euler_integration(double* pos_integrator) {
+	double register pos = *pos_integrator;
 	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
-		(*pos_integrator) += (AS5600_analog_pos[i] - (*pos_integrator)) / AS5600_EULER_DELTA_T_DIV_TAU;
+		pos += (AS5600_analog_pos[i] - pos) / AS5600_EULER_DELTA_T_DIV_TAU;
 	}
-	return round(*pos_integrator);
+	*pos_integrator = pos;
+	return (uint16_t)pos;
+}
+*/
+double euler_integration(double register pos) {
+	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
+		pos += (AS5600_analog_pos[i] - pos) / AS5600_EULER_DELTA_T_DIV_TAU;
+	}
+	return pos;
 }
 /* USER CODE END 0 */
 
@@ -75,10 +82,6 @@ uint16_t euler_integration(double* pos_integrator) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	state.pos = 0;							// the current position
-	state.job = 0;							// the future position
-	instruction.steps = 0;					// the instruction from master computer
-
 	sensor = AS5600_new();
 	sensor->i2c_handle = &hi2c1;
 	sensor->dir_port = AS5600_DIR_GPIO_Port;
@@ -104,11 +107,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_SPI1_Init();
-  MX_TIM1_Init();
   MX_I2C1_Init();
   MX_ADC1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-	HAL_TIM_Base_Start(&htim1);  // start timer_1
+	HAL_TIM_Base_Start(&htim2);  // start timer_2
+
 	// buffers
 	uint64_t	iter			= 0;
 	int8_t		mult			= 0;
@@ -119,7 +123,7 @@ int main(void)
 		  HAL_Delay(50);
 	}  // the sensor has to be on for the code to work
 
-
+	// initialize the AS5600 position variable
 	AS5600_get_angle(sensor, &AS5600_pos);
 	AS5600_pos_integrator = AS5600_pos;
   /* USER CODE END 2 */
@@ -132,7 +136,26 @@ int main(void)
 	HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)&instruction, 16);  // start data receiving loop
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
+	// start receiving ADC data
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)AS5600_analog_pos, AS5600_ADC_BUF_SIZE);
+
+	uint16_t target = 0;
+	uint16_t delta;
+	uint32_t proc_time;
+	while (1) {
+		TIM2->CNT = 0;
+		AS5600_pos_integrator = euler_integration(AS5600_pos_integrator);
+		proc_time = TIM2->CNT;
+		continue;  // TODO: measure integration function and rename this function + variables
+
+		delta = target - AS5600_pos;
+		if (abs_16(delta) <= AS5600_ADC_ERROR_MARGIN) {
+			AS5600_get_angle(sensor, &AS5600_pos);
+			delta = target - AS5600_pos;
+			if (abs_16(delta) <= AS5600_I2C_ERROR_MARGIN) { continue; }  // the angle is accepted and no correction will be made
+		}
+
+	}
 
 	instruction.steps = -100000000;
 	instruction.pulse_delay = 474; // 74;  // safe operating range is from 75us and up
@@ -160,7 +183,6 @@ int main(void)
 			delay_us(pulse_delay_us);
 			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
 			delay_us(pulse_delay_us);
-			AS5600_pos = euler_integration(&AS5600_pos_integrator);
 		}
 		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
     /* USER CODE END WHILE */

@@ -31,7 +31,13 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+// the size of the array is determined by the time to fill in this case it is filled at 70KHz
 #define AS5600_ADC_BUF_SIZE 19
+// the delta_t_div_tau variable is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
+#define AS5600_EULER_DELTA_T_DIV_TAU 3
+// this error margins are applied to the received angle values (in units 360/4096 deg)
+#define AS5600_ADC_ERROR_MARGIN 10
+#define AS5600_I2C_ERROR_MARGIN 2
 
 #include "as5600.h"
 /* USER CODE END Includes */
@@ -79,6 +85,7 @@ extern uint16_t AS5600_pos;
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 #define abs_64(x) (x > 0) ? x : (uint64_t)x
+#define abs_16(x) (x > 0) ? x : (uint16_t)x
 #define round(x) ((x) > ((int64_t)(x))) ? (((int64_t)(x)) + 1) : ((int64_t)(x))
 /* USER CODE END EM */
 
