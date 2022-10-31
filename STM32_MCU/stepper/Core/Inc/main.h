@@ -31,14 +31,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-// the size of the array is determined by the time to fill in this case it is filled at 70KHz
-#define AS5600_ADC_BUF_SIZE 19
-// the delta_t_div_tau variable is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
-#define AS5600_EULER_DELTA_T_DIV_TAU 3
-// this error margins are applied to the received angle values (in units 360/4096 deg)
-#define AS5600_ADC_ERROR_MARGIN 10
-#define AS5600_I2C_ERROR_MARGIN 2
-
 #include "as5600.h"
 /* USER CODE END Includes */
 
@@ -71,17 +63,30 @@ typedef struct {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+/* the tau value is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
+ * (this is first multiplied by 10^2 to improve simulation stability,
+ * then multiplied by 10^9 to pre-compute a part of the calculation done with it (define in terms of us))  */
+#define AS5600_EULER_TAU 23
+// this error margins are applied to the received angle values (in units 360/4096 deg)
+#define AS5600_ADC_ERROR_MARGIN 10
+#define AS5600_I2C_ERROR_MARGIN 2  /*try changing to 1*/
+
+// structures
 extern MCU_State state;
 extern MCU_Instruction instruction;
 extern AS5600_TypeDef* sensor;
-
-extern uint16_t AS5600_analog_pos[AS5600_ADC_BUF_SIZE];
-extern double AS5600_pos_integrator;
+// variables used in the euler method
+extern volatile uint16_t AS5600_analog;	// variable for angles received by ADC (automatic: dma)
+extern uint16_t AS5600_i2c;				// variable for angles received by I2C (manual)
+extern uint16_t* euler_next;			// points to a the variable that will be added using the euler method (either: analog or i2c)
+extern double AS5600_pos_f64;
 extern uint16_t AS5600_pos;
+extern int16_t AS5600_delta_pos;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
+
 #define max(x, y) (x > y) ? x : y
 #define min(x, y) (x < y) ? x : y
 #define abs_64(x) (x > 0) ? x : (uint64_t)x
@@ -93,8 +98,10 @@ extern uint16_t AS5600_pos;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void delay(uint16_t n);
-void set_motor_setting(MCU_Instruction* instruction);
+void delay_us(uint32_t);
+void until_us(uint32_t);
+void set_motor_setting(MCU_Instruction*);
+void euler_method(uint16_t);  // typical execution time ~45 us
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

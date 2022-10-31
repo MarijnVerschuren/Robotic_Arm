@@ -33,9 +33,12 @@ MCU_State state;  // structure that contains the current state of important vari
 MCU_Instruction instruction;
 AS5600_TypeDef* sensor;
 
-uint16_t AS5600_analog_pos[AS5600_ADC_BUF_SIZE];
-double AS5600_pos_integrator;
+volatile uint16_t AS5600_analog;		// variable for angles received by ADC (automatic: dma)
+uint16_t AS5600_i2c;					// variable for angles received by I2C (manual)
+uint16_t* euler_next = &AS5600_analog;	// points to a the variable that will be added using the euler method (either: analog or i2c)
+double AS5600_pos_f64;
 uint16_t AS5600_pos;
+int16_t AS5600_delta_pos;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -46,33 +49,24 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
-void wait_until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
+void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
 	switch(instruction->settings.micro_step) {
 	case 0: GPIOA->ODR |= M2; break;
 	case 1: GPIOA->ODR |= M4; break;
-	// case 2: GPIOA->ODR |= M8; break;  // default is 1/8 micro stepping
+	case 2: GPIOA->ODR |= M8; break;  // default is 1/8 micro stepping
 	case 3: GPIOA->ODR |= M16; break;
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
-/*
-uint16_t euler_integration(double* pos_integrator) {
-	double register pos = *pos_integrator;
-	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
-		pos += (AS5600_analog_pos[i] - pos) / AS5600_EULER_DELTA_T_DIV_TAU;
-	}
-	*pos_integrator = pos;
-	return (uint16_t)pos;
+void euler_method(uint16_t next) {  // typical execution time ~45 us
+	AS5600_pos_f64 += (next - AS5600_pos_f64) / (AS5600_EULER_TAU / (double)TIM5->CNT);  // TIM5->CNT holds the time since the last addition in us
+	AS5600_delta_pos = (uint16_t)AS5600_pos_f64 - AS5600_pos;
+	AS5600_pos = (uint16_t)AS5600_pos_f64;
+	TIM5->CNT = 0;
 }
-*/
-double euler_integration(double register pos) {
-	for (uint32_t i = 0; i < AS5600_ADC_BUF_SIZE; i++) {
-		pos += (AS5600_analog_pos[i] - pos) / AS5600_EULER_DELTA_T_DIV_TAU;
-	}
-	return pos;
-}
+
 /* USER CODE END 0 */
 
 /**
@@ -110,13 +104,10 @@ int main(void)
   MX_I2C1_Init();
   MX_ADC1_Init();
   MX_TIM2_Init();
+  MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start(&htim2);  // start timer_2
-
-	// buffers
-	uint64_t	iter			= 0;
-	int8_t		mult			= 0;
-	uint64_t	pulse_delay_us	= 0;
+	HAL_TIM_Base_Start(&htim5);  // start timer_5
 
 	// initialize AS5600 sensor
 	while (AS5600_init(sensor) != HAL_OK) {
@@ -125,7 +116,7 @@ int main(void)
 
 	// initialize the AS5600 position variable
 	AS5600_get_angle(sensor, &AS5600_pos);
-	AS5600_pos_integrator = AS5600_pos;
+	AS5600_pos_f64 = AS5600_pos;  // set the current angle to the most accurate value for the euler method
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -137,9 +128,31 @@ int main(void)
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
 	// start receiving ADC data
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)AS5600_analog_pos, AS5600_ADC_BUF_SIZE);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
 
-	uint16_t target = 0;
+
+	uint16_t target = 0;  // define this in a struct received from spi
+
+	uint16_t target_delta;
+	while (1) {
+		euler_method(*euler_next);  // update AS5600_pos, AS5600_delta_pos using the selected mode
+		target_delta = target - AS5600_pos;
+		if (euler_next == AS5600_analog && target_delta < AS5600_ADC_ERROR_MARGIN) {  // switch to I2C mode
+			HAL_ADC_Stop_DMA(&hadc1);
+			euler_next = &AS5600_i2c;
+			HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);
+			continue;
+		} else if (euler_next == AS5600_i2c && target_delta > AS5600_ADC_ERROR_MARGIN) {  // switch to ADC mode
+
+			euler_next = &AS5600_analog;
+			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
+			continue;
+		}
+		// TODO: add condition to switch back to analog mode <<<<<<<<<<<<<<<<<<<<<<<
+
+	}
+
+	/*uint16_t target = 0;
 	uint16_t delta;
 	uint32_t proc_time;
 	while (1) {
@@ -156,6 +169,12 @@ int main(void)
 		}
 
 	}
+	*/
+
+	// buffers
+	uint64_t	iter			= 0;
+	int8_t		mult			= 0;
+	uint64_t	pulse_delay_us	= 0;
 
 	instruction.steps = -100000000;
 	instruction.pulse_delay = 474; // 74;  // safe operating range is from 75us and up
