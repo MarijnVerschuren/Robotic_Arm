@@ -76,8 +76,8 @@ extern MCU_State state;
 extern MCU_Instruction instruction;
 extern AS5600_TypeDef* sensor;
 // variables used in the euler method
-extern volatile uint16_t AS5600_analog;	// variable for angles received by ADC (automatic: dma)
-extern uint16_t AS5600_i2c;				// variable for angles received by I2C (manual)
+extern volatile uint16_t AS5600_analog;	// variable for angles received by ADC (automatic: DMA)
+extern volatile uint16_t AS5600_i2c;				// variable for angles received by I2C (automatic: DMA interrupt loop)
 extern uint16_t* euler_next;			// points to a the variable that will be added using the euler method (either: analog or i2c)
 extern double AS5600_pos_f64;
 extern uint16_t AS5600_pos;

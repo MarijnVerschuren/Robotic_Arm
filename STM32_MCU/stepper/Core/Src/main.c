@@ -34,7 +34,7 @@ MCU_Instruction instruction;
 AS5600_TypeDef* sensor;
 
 volatile uint16_t AS5600_analog;		// variable for angles received by ADC (automatic: dma)
-uint16_t AS5600_i2c;					// variable for angles received by I2C (manual)
+volatile uint16_t AS5600_i2c;					// variable for angles received by I2C (manual)
 uint16_t* euler_next = &AS5600_analog;	// points to a the variable that will be added using the euler method (either: analog or i2c)
 double AS5600_pos_f64;
 uint16_t AS5600_pos;
@@ -127,9 +127,14 @@ int main(void)
 	HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)&instruction, 16);  // start data receiving loop
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
+
+
+	while (1) {  // run following tests: execution time and cyclic requests?
+		HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);  // only makes one request??
+	}
+
 	// start receiving ADC data
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
-
 
 	uint16_t target = 0;  // define this in a struct received from spi
 
@@ -140,7 +145,7 @@ int main(void)
 		if (euler_next == AS5600_analog && target_delta < AS5600_ADC_ERROR_MARGIN) {  // switch to I2C mode
 			HAL_ADC_Stop_DMA(&hadc1);
 			euler_next = &AS5600_i2c;
-			HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);
+			HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);  // only makes one request??
 			continue;
 		} else if (euler_next == AS5600_i2c && target_delta > AS5600_ADC_ERROR_MARGIN) {  // switch to ADC mode
 
@@ -152,24 +157,7 @@ int main(void)
 
 	}
 
-	/*uint16_t target = 0;
-	uint16_t delta;
-	uint32_t proc_time;
-	while (1) {
-		TIM2->CNT = 0;
-		AS5600_pos_integrator = euler_integration(AS5600_pos_integrator);
-		proc_time = TIM2->CNT;
-		continue;  // TODO: measure integration function and rename this function + variables
 
-		delta = target - AS5600_pos;
-		if (abs_16(delta) <= AS5600_ADC_ERROR_MARGIN) {
-			AS5600_get_angle(sensor, &AS5600_pos);
-			delta = target - AS5600_pos;
-			if (abs_16(delta) <= AS5600_I2C_ERROR_MARGIN) { continue; }  // the angle is accepted and no correction will be made
-		}
-
-	}
-	*/
 
 	// buffers
 	uint64_t	iter			= 0;
