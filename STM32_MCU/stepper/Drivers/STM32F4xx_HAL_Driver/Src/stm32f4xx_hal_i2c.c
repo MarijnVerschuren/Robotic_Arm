@@ -3223,6 +3223,7 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddr
   uint32_t tickstart = HAL_GetTick();
   __IO uint32_t count = 0U;
   HAL_StatusTypeDef dmaxferstatus;
+
   /* Check the parameters */
   assert_param(IS_I2C_MEMADD_SIZE(MemAddSize));
 

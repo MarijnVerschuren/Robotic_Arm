@@ -25,7 +25,6 @@
 /* USER CODE END 0 */
 
 I2C_HandleTypeDef hi2c1;
-DMA_HandleTypeDef hdma_i2c1_rx;
 
 /* I2C1 init function */
 void MX_I2C1_Init(void)
@@ -82,28 +81,6 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     /* I2C1 clock enable */
     __HAL_RCC_I2C1_CLK_ENABLE();
 
-    /* I2C1 DMA Init */
-    /* I2C1_RX Init */
-    hdma_i2c1_rx.Instance = DMA1_Stream0;
-    hdma_i2c1_rx.Init.Channel = DMA_CHANNEL_1;
-    hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
-    hdma_i2c1_rx.Init.PeriphInc = DMA_PINC_DISABLE;
-    hdma_i2c1_rx.Init.MemInc = DMA_MINC_ENABLE;
-    hdma_i2c1_rx.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-    hdma_i2c1_rx.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-    hdma_i2c1_rx.Init.Mode = DMA_CIRCULAR;
-    hdma_i2c1_rx.Init.Priority = DMA_PRIORITY_LOW;
-    hdma_i2c1_rx.Init.FIFOMode = DMA_FIFOMODE_ENABLE;
-    hdma_i2c1_rx.Init.FIFOThreshold = DMA_FIFO_THRESHOLD_FULL;
-    hdma_i2c1_rx.Init.MemBurst = DMA_MBURST_SINGLE;
-    hdma_i2c1_rx.Init.PeriphBurst = DMA_PBURST_SINGLE;
-    if (HAL_DMA_Init(&hdma_i2c1_rx) != HAL_OK)
-    {
-      Error_Handler();
-    }
-
-    __HAL_LINKDMA(i2cHandle,hdmarx,hdma_i2c1_rx);
-
     /* I2C1 interrupt Init */
     HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
@@ -133,9 +110,6 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
     HAL_GPIO_DeInit(AS5600_SCL_GPIO_Port, AS5600_SCL_Pin);
 
     HAL_GPIO_DeInit(AS5600_SDA_GPIO_Port, AS5600_SDA_Pin);
-
-    /* I2C1 DMA DeInit */
-    HAL_DMA_DeInit(i2cHandle->hdmarx);
 
     /* I2C1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);

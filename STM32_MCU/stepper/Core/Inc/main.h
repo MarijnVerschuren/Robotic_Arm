@@ -63,42 +63,58 @@ typedef struct {
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
+#define MOTOR_STEP_DEG			1.8
+#define DEG_TO_M2_STEP_CONV		1 / (MOTOR_STEP_DEG / 2)
+#define DEG_TO_M4_STEP_CONV		1 / (MOTOR_STEP_DEG / 4)
+#define DEG_TO_M8_STEP_CONV		1 / (MOTOR_STEP_DEG / 8)
+#define DEG_TO_M16_STEP_CONV	1 / (MOTOR_STEP_DEG / 16)
+
+#define AS5600_TO_M2_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 2)
+#define AS5600_TO_M4_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 4)
+#define AS5600_TO_M8_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 8)
+#define AS5600_TO_M16_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 16)
+
 /* the tau value is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
- * (this is first multiplied by 10^2 to improve simulation stability,
  * then multiplied by 10^9 to pre-compute a part of the calculation done with it (define in terms of us))  */
-#define AS5600_EULER_TAU 23
+#define EULER_TAU 2.3
 // this error margins are applied to the received angle values (in units 360/4096 deg)
 #define AS5600_ADC_ERROR_MARGIN 10
 #define AS5600_I2C_ERROR_MARGIN 2  /*try changing to 1*/
 
 // structures
-extern MCU_State state;
-extern MCU_Instruction instruction;
-extern AS5600_TypeDef* sensor;
+extern MCU_State			state;
+extern MCU_Instruction		instruction;
+extern AS5600_TypeDef*		sensor;
 // variables used in the euler method
-extern volatile uint16_t AS5600_analog;	// variable for angles received by ADC (automatic: DMA)
-extern volatile uint16_t AS5600_i2c;				// variable for angles received by I2C (automatic: DMA interrupt loop)
-extern uint16_t* euler_next;			// points to a the variable that will be added using the euler method (either: analog or i2c)
-extern double AS5600_pos_f64;
-extern uint16_t AS5600_pos;
-extern int16_t AS5600_delta_pos;
+extern volatile uint16_t	AS5600_analog;		// variable for angles received by ADC (automatic: DMA)
+extern uint16_t 			AS5600_i2c;			// variable for angles received by I2C (manual: DMA)
+extern volatile uint16_t*	euler_next;			// points to a the variable that will be added using the euler method (either: analog or i2c)
+extern double				AS5600_pos_f64;
+extern uint16_t				AS5600_pos;
+extern int16_t				AS5600_delta_pos;
+
+extern void (*pre_euler_func)(void);
+
+extern double				step_conv;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 
-#define max(x, y) (x > y) ? x : y
-#define min(x, y) (x < y) ? x : y
-#define abs_64(x) (x > 0) ? x : (uint64_t)x
-#define abs_16(x) (x > 0) ? x : (uint16_t)x
-#define round(x) ((x) > ((int64_t)(x))) ? (((int64_t)(x)) + 1) : ((int64_t)(x))
+#define MAX(x, y) ((x) > (y)) ? (x) : (y)
+#define MIN(x, y) ((x) < (y)) ? (x) : (y)
+#define CLAMP(x, y, z) MIN(MAX(x, y), z)
+#define ABS_64(x) ((x) > 0) ? (x) : (uint64_t)(x)
+#define ABS_16(x) ((x) > 0) ? (x) : (uint16_t)(x)
+#define ROUND(x) ((x) > ((int64_t)(x))) ? (((int64_t)(x)) + 1) : ((int64_t)(x))
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void dma_i2c_callback(DMA_HandleTypeDef* hdma);
+void i2c_pre_euler(void);
+void adc_pre_euler(void);
 
 void delay_us(uint32_t);
 void until_us(uint32_t);
