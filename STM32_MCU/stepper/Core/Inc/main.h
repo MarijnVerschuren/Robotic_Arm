@@ -98,6 +98,8 @@ extern int16_t AS5600_delta_pos;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+void dma_i2c_callback(DMA_HandleTypeDef* hdma);
+
 void delay_us(uint32_t);
 void until_us(uint32_t);
 void set_motor_setting(MCU_Instruction*);

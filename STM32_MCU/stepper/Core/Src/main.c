@@ -48,6 +48,10 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void dma_i2c_callback(DMA_HandleTypeDef* hdma) {
+	HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);
+}
+
 void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
 void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
 void set_motor_setting(MCU_Instruction* instruction) {
@@ -110,9 +114,7 @@ int main(void)
 	HAL_TIM_Base_Start(&htim5);  // start timer_5
 
 	// initialize AS5600 sensor
-	while (AS5600_init(sensor) != HAL_OK) {
-		  HAL_Delay(50);
-	}  // the sensor has to be on for the code to work
+	while (AS5600_init(sensor) != HAL_OK) {}  // the sensor has to be on for the code to work
 
 	// initialize the AS5600 position variable
 	AS5600_get_angle(sensor, &AS5600_pos);
@@ -128,13 +130,15 @@ int main(void)
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
 
-
-	while (1) {  // run following tests: execution time and cyclic requests?
-		HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);  // only makes one request??
-	}
-
 	// start receiving ADC data
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
+	// HAL_I2C_Mem_Read_DMA exec time 0 - 5 us??
+	HAL_I2C_Mem_Read_DMA(&hi2c1, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, (uint8_t*)&AS5600_i2c, 2);  // only makes one request??
+	hdma_i2c1_rx.XferCpltCallback = dma_i2c_callback;
+
+	while (1) {  // run following tests: execution time and cyclic requests?
+	}
+
 
 	uint16_t target = 0;  // define this in a struct received from spi
 
@@ -156,8 +160,6 @@ int main(void)
 		// TODO: add condition to switch back to analog mode <<<<<<<<<<<<<<<<<<<<<<<
 
 	}
-
-
 
 	// buffers
 	uint64_t	iter			= 0;
