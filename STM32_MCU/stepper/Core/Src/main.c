@@ -131,7 +131,7 @@ int main(void) {
   /* USER CODE BEGIN WHILE */
 
 	// all DMA connectors are configured in cyclic mode so these functions have to be called once
-	/*  DISABLED FOR STEPPER DRIVER TESTING
+	/*  DISABLED FOR TESTING
 	HAL_SPI_Receive_DMA(&hspi1, (uint8_t*)&instruction, 16);  // start data receiving loop
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
@@ -172,6 +172,7 @@ int main(void) {
 		steps = ABS_64(target_delta) * step_conv;
 		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // enable stepper
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta > 0);
+		steps = MIN(steps, 5 * step_conv);  // only run for 5 segments max
 		for (; steps; steps--) {
 			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
 			delay_us(pulse_delay);
