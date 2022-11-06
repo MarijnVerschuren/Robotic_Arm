@@ -40,10 +40,15 @@ double				AS5600_pos_f64;
 uint16_t			AS5600_pos;
 int16_t				AS5600_delta_pos;
 
+// define the following two in a struct received from spi
+uint16_t			target = 2000;
+int16_t				target_delta;
+
+double				step_gain;	// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
+
 void (*pre_euler_func)(void) = NULL;
 // TODO: add a adc modifier based on the i2c readings so that the i2c and adc are inline
 
-double				step_conv;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,10 +63,10 @@ void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
 	switch(instruction->settings.micro_step) {
-	case 0: GPIOA->ODR |= M2; step_conv = AS5600_TO_M2_STEP_CONV; break;
-	case 1: GPIOA->ODR |= M4; step_conv = AS5600_TO_M4_STEP_CONV; break;
-	case 2: GPIOA->ODR |= M8; step_conv = AS5600_TO_M8_STEP_CONV; break;  // default is 1/8 micro stepping
-	case 3: GPIOA->ODR |= M16; step_conv = AS5600_TO_M16_STEP_CONV; break;
+	case 0: GPIOA->ODR |= M2; break;
+	case 1: GPIOA->ODR |= M4; break;
+	case 2: GPIOA->ODR |= M8; break;  // default is 1/8 micro stepping
+	case 3: GPIOA->ODR |= M16; break;
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
 }
@@ -76,13 +81,44 @@ void euler_method(uint16_t next) {  // typical execution time ~45 us
 void i2c_pre_euler(void) {
 	AS5600_get_angle(sensor, &AS5600_i2c);
 }
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
+	if (htim != &htim10) { return; }
+	//if (pre_euler_func) { (*pre_euler_func)(); }
+	euler_method(*euler_next);  // update AS5600_pos, AS5600_delta_pos using the selected mode
+	target_delta = target - AS5600_pos;
+
+	// TODO: create optimal path or remove the 0 to 4096 jump in error when rotating
+	// TODO: consider passing rotation dir with spi
+	// TODO: add ease in ease out
+	// TODO: tune interrupt timing
+	// TODO: add the mode switching code back
+
+	/* mode switching code is disabled
+	//target_delta = MIN(target_delta - 4096, MIN(target_delta, target_delta + 4096));  // calculate target_delta in the case of a roll-over
+	if (euler_next == &AS5600_analog && ABS_16(target_delta) < AS5600_ADC_ERROR_MARGIN) {		// switch to I2C mode
+		HAL_ADC_Stop_DMA(&hadc1);			// disable fast ADC mode
+		euler_next = &AS5600_i2c;
+		pre_euler_func = &i2c_pre_euler;	// enable slow I2C mode
+	} else if (euler_next == &AS5600_i2c && ABS_16(target_delta) > AS5600_I2C_ERROR_MARGIN) {	// switch to ADC mode
+		pre_euler_func = NULL;										// disable slow I2C mode
+		euler_next = &AS5600_analog;
+		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);	// enable fast ADC mode
+	}*/
+	if (target_delta != 0) {
+		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta > 0);
+		step_gain = MIN(ABS_16(target_delta) / 512, 1);  // all deltas greater than 1/8 rotation are met by a gain of 100%
+	} else { step_gain = 0; }
+	return;
+}
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void) {
+int main(void)
+{
   /* USER CODE BEGIN 1 */
 	sensor = AS5600_new();
 	sensor->i2c_handle = &hi2c1;
@@ -113,10 +149,10 @@ int main(void) {
   MX_ADC1_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start(&htim2);  // start timer_2
 	HAL_TIM_Base_Start(&htim5);  // start timer_5
-
 	// initialize AS5600 sensor
 	while (AS5600_init(sensor) != HAL_OK) {}  // the sensor has to be on for the code to work
 
@@ -139,47 +175,29 @@ int main(void) {
 	// start receiving ADC data
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
 
-	// define this in a struct received from spi
-	uint16_t target = 4090;
-	instruction.pulse_delay = 474; // 74;  // safe operating range is from 75us and up
+	instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
 	instruction.settings.micro_step = 3;
 	instruction.settings.spread_mode = 0;
-	// \ define this in a struct received from spi
+
+	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
+	// TODO: Add interrupt to a timer that will run all the sensor code
 
 	set_motor_setting(&instruction);
 
-	int16_t target_delta;
-	uint32_t pulse_delay = 75;
-	uint64_t steps;
+	uint32_t min_pulse_delay = 75;
 	TIM5->CNT = 0;
-	while (1) {  // constant rotation
-		if (pre_euler_func) { (*pre_euler_func)(); }
-		euler_method(*euler_next);  // update AS5600_pos, AS5600_delta_pos using the selected mode
-		target_delta = target - AS5600_pos;
-		target_delta = MIN(target_delta - 4096, MIN(target_delta, target_delta + 4096));  // calculate target_delta in the case of a roll-over
-		if (euler_next == &AS5600_analog && target_delta < AS5600_ADC_ERROR_MARGIN) {		// switch to I2C mode
-			HAL_ADC_Stop_DMA(&hadc1);			// disable fast ADC mode
-			euler_next = &AS5600_i2c;
-			pre_euler_func = &i2c_pre_euler;	// enable slow I2C mode
-			continue;
-		} else if (euler_next == &AS5600_i2c && target_delta > AS5600_I2C_ERROR_MARGIN) {	// switch to ADC mode
-			pre_euler_func = NULL;										// disable slow I2C mode
-			euler_next = &AS5600_analog;
-			HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);	// enable fast ADC mode
-			continue;
-		}
-
-		steps = ABS_64(target_delta) * step_conv;
-		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // enable stepper
-		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta > 0);
-		steps = MIN(steps, 5 * step_conv);  // only run for 5 segments max
-		for (; steps; steps--) {
-			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
-			delay_us(pulse_delay);
-			HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
-			delay_us(pulse_delay);
-		}
-		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);  // disable stepper
+	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt)
+	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // enable stepper
+	while (1) {
+		if (step_gain == 0) { continue; }
+		// dir is set in interrupt
+		register uint16_t pulse_delay = min_pulse_delay / step_gain;
+		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
+		delay_us(min_pulse_delay);
+		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
+		delay_us(min_pulse_delay);
+	}
+	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);  // disable stepper
 
 	/*// buffers
 	uint64_t	iter			= 0;
@@ -212,8 +230,7 @@ int main(void) {
 	*/
     /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
-	}
+    /* USER CODE BEGIN 3 */
   /* USER CODE END 3 */
 }
 

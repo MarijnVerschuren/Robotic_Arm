@@ -93,6 +93,8 @@ extern double				AS5600_pos_f64;
 extern uint16_t				AS5600_pos;
 extern int16_t				AS5600_delta_pos;
 
+extern double				step_gain;	// -1 (backward) || 1 (forward) || 0 (idle)
+
 extern void (*pre_euler_func)(void);
 
 extern double				step_conv;
@@ -125,6 +127,8 @@ void euler_method(uint16_t);  // typical execution time ~45 us
 /* Private defines -----------------------------------------------------------*/
 #define AS5600_ANALOG_IN_Pin GPIO_PIN_0
 #define AS5600_ANALOG_IN_GPIO_Port GPIOA
+#define INSTUCT_GO_Pin GPIO_PIN_3
+#define INSTUCT_GO_GPIO_Port GPIOA
 #define NSS_Pin GPIO_PIN_4
 #define NSS_GPIO_Port GPIOA
 #define SCK_Pin GPIO_PIN_5
