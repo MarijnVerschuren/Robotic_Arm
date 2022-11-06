@@ -87,6 +87,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	//if (pre_euler_func) { (*pre_euler_func)(); }
 	euler_method(*euler_next);  // update AS5600_pos, AS5600_delta_pos using the selected mode
 	target_delta = target - AS5600_pos;
+	target_delta = ABS16(target) < ABS16(target_delta_a - 4096) ? target : target_delta_a - 4096;
 
 	// TODO: create optimal path or remove the 0 to 4096 jump in error when rotating
 	// TODO: consider passing rotation dir with spi
