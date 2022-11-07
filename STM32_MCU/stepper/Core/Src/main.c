@@ -194,9 +194,9 @@ int main(void)
 		// dir is set in interrupt
 		register uint16_t pulse_delay = min_pulse_delay / step_gain;
 		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
-		delay_us(min_pulse_delay);
+		delay_us(pulse_delay);
 		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);
-		delay_us(min_pulse_delay);
+		delay_us(pulse_delay);
 	}
 	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);  // disable stepper
 
