@@ -87,7 +87,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	//if (pre_euler_func) { (*pre_euler_func)(); }
 	euler_method(*euler_next);  // update AS5600_pos, AS5600_delta_pos using the selected mode
 	target_delta = target - AS5600_pos;
-	target_delta = ABS16(target) < ABS16(target_delta_a - 4096) ? target : target_delta_a - 4096;
+	target_delta = ABS(target_delta) < ABS(target_delta - 4096) ? target_delta : target_delta - 4096;
 
 	// TODO: create optimal path or remove the 0 to 4096 jump in error when rotating
 	// TODO: consider passing rotation dir with spi
@@ -107,8 +107,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);	// enable fast ADC mode
 	}*/
 	if (target_delta != 0) {
-		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta > 0);
-		step_gain = MIN(ABS_16(target_delta) / 512, 1);  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
+		step_gain = MIN(ABS((double)target_delta / 1024), MIN(ABS(((double)target_delta + 1024) / 1024), ABS(((double)target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		// optimize this or change the function
 	} else { step_gain = 0; }
 	return;
 }
@@ -125,7 +126,7 @@ int main(void)
 	sensor->i2c_handle = &hi2c1;
 	sensor->dir_port = AS5600_DIR_GPIO_Port;
 	sensor->dir_pin = AS5600_DIR_Pin;
-	sensor->positive_rotation_direction = AS5600_DIR_CCW;
+	sensor->positive_rotation_direction = AS5600_DIR_CW;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/

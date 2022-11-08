@@ -106,8 +106,7 @@ extern double				step_conv;
 #define MAX(x, y) ((x) > (y)) ? (x) : (y)
 #define MIN(x, y) ((x) < (y)) ? (x) : (y)
 #define CLAMP(x, y, z) MIN(MAX(x, y), z)
-#define ABS_64(x) ((x) > 0) ? (x) : (uint64_t)(x)
-#define ABS_16(x) ((x) > 0) ? (x) : (uint16_t)(x)
+#define ABS(x) ((x) > 0) ? (x) : -(x)
 #define ROUND(x) ((x) > ((int64_t)(x))) ? (((int64_t)(x)) + 1) : ((int64_t)(x))
 /* USER CODE END EM */
 
