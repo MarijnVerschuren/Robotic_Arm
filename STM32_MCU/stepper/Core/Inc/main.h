@@ -77,6 +77,8 @@ typedef struct {
 /* the tau value is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
  * then multiplied by 10^9 to pre-compute a part of the calculation done with it (define in terms of us))  */
 #define EULER_TAU 2.3
+#define MIN_STEPPER_GAIN 1e-4
+#define MIN_STEPPER_DELAY 75
 // this error margins are applied to the received angle values (in units 360/4096 deg)
 #define AS5600_ADC_ERROR_MARGIN 10
 #define AS5600_I2C_ERROR_MARGIN 2  /*try changing to 1*/
@@ -87,17 +89,12 @@ extern MCU_Instruction		instruction;
 extern AS5600_TypeDef*		sensor;
 // variables used in the euler method
 extern volatile uint16_t	AS5600_analog;		// variable for angles received by ADC (automatic: DMA)
-extern uint16_t 			AS5600_i2c;			// variable for angles received by I2C (manual: DMA)
-extern volatile uint16_t*	euler_next;			// points to a the variable that will be added using the euler method (either: analog or i2c)
+extern uint16_t 			AS5600_prev;		// variable that stores the last measurement
 extern double				AS5600_pos_f64;
 extern uint16_t				AS5600_pos;
 extern int16_t				AS5600_delta_pos;
 
 extern double				step_gain;	// -1 (backward) || 1 (forward) || 0 (idle)
-
-extern void (*pre_euler_func)(void);
-
-extern double				step_conv;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -120,14 +117,14 @@ void adc_pre_euler(void);
 void delay_us(uint32_t);
 void until_us(uint32_t);
 void set_motor_setting(MCU_Instruction*);
-void euler_method(uint16_t);  // typical execution time ~45 us
+void euler_method();  // typical execution time ~45 us
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define AS5600_ANALOG_IN_Pin GPIO_PIN_0
 #define AS5600_ANALOG_IN_GPIO_Port GPIOA
-#define INSTUCT_GO_Pin GPIO_PIN_3
-#define INSTUCT_GO_GPIO_Port GPIOA
+#define INSTUCTION_INT_Pin GPIO_PIN_3
+#define INSTUCTION_INT_GPIO_Port GPIOA
 #define NSS_Pin GPIO_PIN_4
 #define NSS_GPIO_Port GPIOA
 #define SCK_Pin GPIO_PIN_5

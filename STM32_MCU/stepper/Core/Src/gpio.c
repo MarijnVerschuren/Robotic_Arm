@@ -59,10 +59,10 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, STEPPER_MS2_Pin|STEPPER_MS1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = INSTUCT_GO_Pin;
+  GPIO_InitStruct.Pin = INSTUCTION_INT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(INSTUCT_GO_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(INSTUCTION_INT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PBPin PBPin */
   GPIO_InitStruct.Pin = STEPPER_NEN_Pin|STEPPER_DIR_Pin;
