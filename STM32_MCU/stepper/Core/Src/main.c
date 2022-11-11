@@ -82,6 +82,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	target_delta = target - AS5600_pos;
 	target_delta = ABS(target_delta) < ABS(target_delta - 4096) ? target_delta : target_delta - 4096;
 
+	// TODO: buffer older measurements
+	// TODO: create optimal path or remove the 0 to 4096 jump in error when rotating
+	// TODO: consider passing rotation dir with spi
+	// TODO: add ease in ease out
+	// TODO: tune interrupt timing
+	// TODO: add the mode switching code back
+	// TODO: different filter types: Infinite impulse response (IIR)
+
 	// TODO: add continuous rotation space (-inf, inf) (software)
 	// TODO: add defining rotation dir with SPI (this is obviously implicated with the previous TODO)
 	// TODO: re-do: ease-in ease-out function
