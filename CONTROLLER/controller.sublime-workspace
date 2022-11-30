@@ -1,0 +1,640 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"rec",
+				"receive_buffer"
+			],
+			[
+				"g",
+				"get_op_code"
+			],
+			[
+				"crc",
+				"crc_8"
+			],
+			[
+				"py",
+				"py_lib_wrap"
+			],
+			[
+				"ao",
+				"a_ori_check"
+			],
+			[
+				"OPC",
+				"OP_CODES"
+			],
+			[
+				"pres",
+				"prev_presented_s"
+			],
+			[
+				"hea",
+				"HEADER_SIZE"
+			],
+			[
+				"pop",
+				"populate_page_list"
+			],
+			[
+				"f",
+				"firstChild"
+			],
+			[
+				"re",
+				"refresh_container"
+			],
+			[
+				"pa",
+				"page_count"
+			],
+			[
+				"s",
+				"space-between"
+			],
+			[
+				"spa",
+				"space-between"
+			],
+			[
+				"flex-o",
+				"flex-direction"
+			],
+			[
+				"flex",
+				"flex-grow"
+			],
+			[
+				"add",
+				"add_content"
+			],
+			[
+				"mime",
+				"mimetype"
+			],
+			[
+				"d",
+				"dashed"
+			],
+			[
+				"fle",
+				"flex-start"
+			],
+			[
+				"y",
+				"justify-content"
+			],
+			[
+				"max",
+				"max-width"
+			],
+			[
+				"p",
+				"print_a"
+			],
+			[
+				"se",
+				"sessions"
+			],
+			[
+				"Fil",
+				"File"
+			],
+			[
+				"ove",
+				"overview_page"
+			],
+			[
+				"na",
+				"navbar"
+			],
+			[
+				"pass",
+				"password-generator-result"
+			],
+			[
+				"typ",
+				"type_count"
+			],
+			[
+				"ra",
+				"random_func"
+			],
+			[
+				"type",
+				"type_count"
+			],
+			[
+				"rand",
+				"random_symbol"
+			],
+			[
+				"ran",
+				"random_number"
+			],
+			[
+				"font",
+				"font-size"
+			],
+			[
+				"ba",
+				"background"
+			],
+			[
+				"file",
+				"file_system"
+			],
+			[
+				"__",
+				"__bind_key__"
+			],
+			[
+				"get",
+				"get_active_user"
+			],
+			[
+				"v",
+				"virtual_indices"
+			],
+			[
+				"sess",
+				"session_required"
+			],
+			[
+				"stat",
+				"static_folder"
+			],
+			[
+				"sta",
+				"static_folder"
+			],
+			[
+				"j",
+				"jwt_blocklist_clean_up"
+			],
+			[
+				"uin",
+				"uint64_t"
+			],
+			[
+				"marin",
+				"margin-top"
+			],
+			[
+				"cont",
+				"contentBackupPath"
+			],
+			[
+				"use",
+				"username"
+			],
+			[
+				"encr",
+				"encryptFile"
+			],
+			[
+				"sql",
+				"sqlite3"
+			],
+			[
+				"filname",
+				"fileNameSize"
+			],
+			[
+				"tokenize",
+				"tokenizedFileNameSize"
+			],
+			[
+				"enc",
+				"encKeySize"
+			],
+			[
+				"toke",
+				"tokenizedFileNameSize"
+			],
+			[
+				"bufe",
+				"bufferPath"
+			],
+			[
+				"sor",
+				"sortUsers"
+			],
+			[
+				"Use",
+				"UserObj"
+			],
+			[
+				"Co",
+				"Content_User"
+			],
+			[
+				"CONT",
+				"CONTENT_DIR"
+			],
+			[
+				"CONTT",
+				"CONTENT_SIZE"
+			],
+			[
+				"conten",
+				"ContentDir"
+			],
+			[
+				"form",
+				"form-attribute"
+			],
+			[
+				"te",
+				"text-indent\tproperty"
+			],
+			[
+				"ali",
+				"align-self\tproperty"
+			],
+			[
+				"main",
+				"main-content-large"
+			],
+			[
+				"tra",
+				"transform\tproperty"
+			],
+			[
+				"border",
+				"border-width"
+			],
+			[
+				"align",
+				"align-self"
+			],
+			[
+				"marg",
+				"margin-left"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				"Syntax Check"
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"men",
+				"View: Toggle Menu"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"c",
+				"Convert Case: Swap Case"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 158.0,
+		"history":
+		[
+			"clear",
+			"exit()",
+			"quit()",
+			"clear",
+			"cls",
+			"comp.bat",
+			"cd",
+			"./",
+			"exit",
+			"quit",
+			"clear"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"C:\\Users\\marij\\OneDrive\\Desktop\\Code_Stuff\\Projects\\Arduino\\robotic_arm\\controller"
+	],
+	"file_history":
+	[
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/controller.py",
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/lib/__init__.py",
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/lib/py_lib.py",
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/lib/py_lib_wrap.py",
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/lib/compile/src/py_lib.hpp",
+		"/mnt/nvme/home/marijn/Github/Robotic_Arm/CONTROLLER/lib/compile/src/py_lib.cpp",
+		"/C/Users/marij/OneDrive/Documenten/GitHub/Robotic_Arm/STM32_MCU/stepper/Core/Src/main.c",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/MISC/test.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/compile/src/py_lib.i",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/CONTROLLER/lib/py_lib.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/CONTROLLER/lib/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/CONTROLLER/controller.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/MISC/mklist.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/py_lib_wrap.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/_py_lib.pyd",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/compile/compile.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/compile/src/py_lib.hpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/compile/src/py_lib.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/py_lib.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/old_src/robotic_arm.ino",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Arduino/robotic_arm/controller/lib/compile/setup.py",
+		"/F/Site/operations/a.txt",
+		"/D/Site/backend/__init__.py",
+		"/D/Site/backend/server.py",
+		"/D/Site/frontend/static/css/settings.css",
+		"/D/Site/frontend/static/css/upload.css",
+		"/D/Site/frontend/static/css/popup.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/settings.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/buttons.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/overview.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/home.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/base.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/register.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/login.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/navbar.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/form.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/css/password_generator.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/test.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/edit_json_files.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/create_file_tables.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/functionality.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/test.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/error.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/401.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/static/js/register.js",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db/files_2.json",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db/files_1.json",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/file_tree_1.json",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/file_tree_2.json",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/operations/new_file.sqlite3-journal",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/MISC/kwarg_test.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/old/static/css/base.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db/file_tree_1.json",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/create_file_tables.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db/files.sqlite3",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/old/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/old/html/base.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/constants.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/style/css/register.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/style/css/login.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/style/css/home.css",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/server.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/Misc/test/test.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new[api_attached]/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/bots/yuccies/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/bots/Base/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/bots/Base/lib.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/style/css/base.css",
+		"/C/Users/marij/OneDrive/Desktop/PWS script.txt",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/home.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/auth.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/home.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/register.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/login.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/frontend/html/base.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/stucture.txt",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db_models.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/api.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/api/functionality.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/api/db_models.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/api/api.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/api/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/old/html/login.html",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/unfinished/JWT/json_web_token.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/pages/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/db/users.sqlite3",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/api.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/new/backend/json_web_token.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/main-old.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/main.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/lib.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/src/lib.hpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/src/lib.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/lib/lib.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/lib/__init__.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/compile.bat",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/src/lib.i",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/src/setup.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/run.bat",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/back_end/lib/_lib.pyd",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/webProjects/site/5/api.py",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/main.asm",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/math.asm",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/core.h",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/run.ps1",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/comp.ps1",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/comp.sh",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/run.sh",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/comp.bat",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/core.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/hash.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/main.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/main.o",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/math.o",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/hash.o",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/int/core.o",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/hash.h",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/math.h",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/math.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/os/no_os_lib_0/lib/src/main.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/algorithm/hash/src/hash.h",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/algorithm/hash/src/main.cpp",
+		"/C/Users/marij/OneDrive/Desktop/Code_Stuff/Projects/algorithm/hash/src/hash.cpp"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 102.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": true,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": false,
+		"use_buffer2": false,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"folders":
+	[
+		{
+			"path": "C:\\Users\\marij\\OneDrive\\Desktop\\Code_Stuff\\Projects\\Arduino\\robotic_arm\\controller"
+		}
+	],
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 44.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.4640625,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 27.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 211.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+		"max_columns": 4
+	}
+}
