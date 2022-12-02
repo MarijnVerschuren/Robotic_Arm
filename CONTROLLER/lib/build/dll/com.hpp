@@ -17,4 +17,5 @@ struct instruction {  // 24
 };
 
 
-char* format(int64_t target, uint32_t min_delay, uint32_t max_delay, float dropoff_rate, uint8_t micro_step, uint8_t srd_mode);
+extern "C" __declspec(dllexport) char* format(int64_t target, uint32_t min_delay, uint32_t max_delay, float dropoff_rate, uint8_t micro_step, uint8_t srd_mode);
+extern "C" __declspec(dllexport) void discard(char* data);

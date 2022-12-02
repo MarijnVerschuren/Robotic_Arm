@@ -2,7 +2,7 @@
 
 
 
-char* format(int64_t target, uint32_t min_delay, uint32_t max_delay, float dropoff_rate, uint8_t micro_step, uint8_t srd_mode) {
+extern "C" __declspec(dllexport) char* format(int64_t target, uint32_t min_delay, uint32_t max_delay, float dropoff_rate, uint8_t micro_step, uint8_t srd_mode) {
 	instruction* data =		(instruction*)malloc(sizeof(instruction));
 	data->target =			target;
 	data->min_delay =		min_delay;
@@ -12,3 +12,5 @@ char* format(int64_t target, uint32_t min_delay, uint32_t max_delay, float dropo
 	data->srd_mode =		srd_mode;
 	return (char*)data;
 }
+
+extern "C" __declspec(dllexport) void discard(char* data) { free(data); }
