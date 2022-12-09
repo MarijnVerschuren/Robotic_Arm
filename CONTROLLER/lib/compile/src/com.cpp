@@ -15,6 +15,18 @@ uint8_t* new_instruction(uint16_t id, uint8_t action, double target, double max_
 	return (uint8_t*)data;
 }
 
+void get_instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* id, uint16_t* crc) {
+	instruction* data =	(instruction*)package;
+	*target =			data->target;
+	*max_vel =			data->max_vel;
+	*max_acc =			data->max_acc;
+	*micro_step =		data->micro_step;
+	*srd_mode =			data->srd_mode;
+	*action =			data->action;
+	*id =				data->id;
+	*crc =				data->crc;
+}
+
 
 uint8_t* new_handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud) {
 	handshake* data =	(handshake*)malloc(sizeof(handshake));
@@ -25,9 +37,8 @@ uint8_t* new_handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud) {
 	return (uint8_t*)data;
 }
 
-
-void get_handshake_data(uint32_t init, uint8_t* motor_count, uint8_t* init_0, uint32_t* baud, uint16_t* crc) {
-	handshake* data =	(handshake*)&init;
+void get_handshake_data(uint32_t package, uint8_t* motor_count, uint8_t* init_0, uint32_t* baud, uint16_t* crc) {
+	handshake* data =	(handshake*)&package;
 	// in this struct counting starts from 0
 	*motor_count =		data->motor_count;
 	*init_0 =			data->init_0;

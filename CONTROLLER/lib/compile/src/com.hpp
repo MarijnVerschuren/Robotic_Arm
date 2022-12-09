@@ -56,8 +56,9 @@ struct handshake {  // uint8_t[6]
 
 // formats variables into a instruction packet
 uint8_t* new_instruction(uint16_t id, uint8_t action, double target, double max_vel, double max_acc, uint8_t micro_step, uint8_t srd_mode);
+void get_instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* id, uint16_t* crc);
 
 // sets the settings of received handshake
 uint8_t* new_handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud);
 // init is type uint32_t to force size of buffer
-void get_handshake_data(uint32_t init, uint8_t* motor_count, uint8_t* init_0, uint32_t* baud, uint16_t* crc);
+void get_handshake_data(uint32_t package, uint8_t* motor_count, uint8_t* init_0, uint32_t* baud, uint16_t* crc);
