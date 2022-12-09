@@ -36,7 +36,48 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+/* Flags
+ * part of instruction that tells mcu what to do with the provided data
+ */
+// 0xf
+enum flags {
+	EXEC = 0x01,
+	OVERRIDE = 0x02,
+	SYNC = 0x04,
+	POLL = 0x08
+};
 
+/* Instruction
+ * motor instruction (includes flags)
+ */
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff
+typedef struct {  // uint8_t[28]
+	double		target;			// rad
+	double		max_vel;		// rad / s
+	double		max_acc;		// rad / s^2
+	uint16_t	micro_step: 2;  // microstep setting
+	uint16_t	srd_mode: 1;	// srd mode on the motor controller
+	uint16_t	action: 4;		// look in ACTION enum for possible actions
+	uint16_t	id: 9;			// selected motor
+	uint16_t	crc;			// TODO (not a priority)
+} instruction;
+
+/* Handshake
+ * this struct is used to establish a handshake between pc and mcu
+ * it deliberatly has no error checking so that unstable connections are not accepted
+ * to establish a successfull connection the received data is just sent back to the mcu with some flags set to preform init actions
+ */
+// ((0x1f, 0x20, 0xffffffc) => 0xffffffff, 0xffff
+typedef struct {  // uint8_t[6]
+	uint32_t motor_count: 5;	// = max motor id (starts counting from 0)
+	uint32_t init_0: 1;			// make mcu initialize the motors to their 0 position
+	// set baud rate after handshake
+	// first handshake is always done with 9600 baud
+	// after change handshake will have to be established again
+	// https://community.st.com/s/question/0D53W00001GkPvRSAV/is-it-possible-to-change-the-baud-rate-of-the-usart-during-run-time-in-stm32-cube-ide
+	uint32_t baud: 26;
+	uint16_t crc;
+} handshake;
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -53,7 +94,6 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
