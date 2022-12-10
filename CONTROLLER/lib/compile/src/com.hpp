@@ -4,6 +4,11 @@
 #include "int.hpp"
 
 
+
+#define SYNC_BYTE 0x5C
+
+
+
 /* Flags
  * part of instruction that tells mcu what to do with the provided data
  */

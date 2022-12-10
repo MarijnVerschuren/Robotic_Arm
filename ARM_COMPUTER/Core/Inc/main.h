@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "uart_buffer.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -82,7 +82,6 @@ typedef struct {  // uint8_t[6]
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -104,7 +103,7 @@ void Error_Handler(void);
 #define CS_2_Pin GPIO_PIN_15
 #define CS_2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-
+#define SYNC_BYTE 0x5C
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

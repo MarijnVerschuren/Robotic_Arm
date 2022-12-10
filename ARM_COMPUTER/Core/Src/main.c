@@ -25,6 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <stdlib.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,7 +46,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t RX_data[896];  // 32 instructions
+//uint8_t RX_data[896];  // 32 instructions
+uart_ibuf* RX_data;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -87,48 +90,49 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+	RX_data = new_uart_ibuf(&huart2, 1024);  // starts receiving
 
-  {  // anonymous scope so that temporary variables are cleaned up
-	uint32_t baud = 9600;  // default baud
-	// motor_count starts counting from 0
-	uint8_t motor_count = 0;  // TODO: make code to find motor count OUTSIDE anon scope
-	handshake init;
-	memset(&init, 0, 6);  // set to 0
+	uint8_t motor_count = 0;  // TODO: make code to find motor count
 
-	HANDSHAKE:  // jmp to label in the case baud is changed (redo handshake)
+	{  // anonymous scope so that temporary variables are cleaned up
+		uint32_t baud = 9600;  // default baud
+		// motor_count starts counting from 0
+		handshake init;
+		memset((void*)&init, 0, 6);  // set to 0
 
-	// THIS WORKS!!!
-	while (init.crc != 0xffff) {  // handshake
-		// block cpu until 4 bytes are received
-		HAL_UART_Receive(&huart2, (uint8_t*)&init, 6, HAL_MAX_DELAY);
-	}  // TODO: crc check before exit and send
+		HANDSHAKE:  // jmp to label in the case baud is changed (redo handshake)
 
-	init.motor_count = motor_count;
-	HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
+		while (init.crc != 0xffff) {  // handshake
+			if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
+			if (uart_ibuf_read(RX_data, &init, 6)) { continue; }
+		}  // TODO: add crc validation and fixing
 
-	if (init.init_0) {} // TODO: move all motors to their 0 pos
-	if (init.baud != baud) {
-		// TODO: set new baud and go back to handshake
-		baud = init.baud;
-		goto HANDSHAKE;
+		init.motor_count = motor_count;
+		HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
+		if (init.init_0) {} // TODO: move all motors to their 0 position
+		if (init.baud != baud) {
+			// TODO: set new baud and go back to handshake
+			baud = init.baud;
+			goto HANDSHAKE;
+		}
 	}
-  }  // TODO: try improving handshake process by using DMA from the start
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_UART_Receive_DMA(&huart2, RX_data, 896);
-
-  char msgBuf[] = "wdawdadawdw\r\n";
-  while (1) {
-	  // UART NEVER COMPLETES FIRST TRANSMIT!!!!
-	  HAL_UART_Transmit(&huart2, (uint8_t*)msgBuf, 13, 10);
-	  // TODO: GETTING FATAL ERROR
-	  HAL_Delay(1000);
+	instruction inst;
+	while (1) {
+		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
+		if (uart_ibuf_read(RX_data, &inst, 28)) { continue; }
+		HAL_UART_Transmit(&huart2, (uint8_t*)&inst, 28, 100);  // 10ms timeout is too little!!!!
+		// TODO: add CRC validation
+		// TODO: send CRC back only (that'll be enough to verify)
+		// TODO: make messages more flexible for other motor drivers
+		// TODO: send over SPI to the motor controller
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 

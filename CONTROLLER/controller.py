@@ -18,22 +18,16 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: int = 10) -> int:
 	ser.reset_input_buffer()
 	ser.reset_output_buffer()
 
-	data_o = new_handshake(2, *init_args)
-	print(''.join(format(x, '08b') for x in data_o), get_handshake_data(data_o), len(data_o))
+	data_o = new_handshake(0, *init_args)
 	while True:
+		ser.write(bytes([SYNC_BYTE]))  # sync byte
 		ser.write(data_o)
-		time.sleep(.1)
 		if ser.inWaiting() < 6: continue  # no response
-		data_i = ser.read(6)
-		#data_i = data_i[1:6];
-		data_if = get_handshake_data(data_i)
-		print(''.join(format(x, '08b') for x in data_i), data_if, data_i)
-
-		if data_if[1:3] == init_args and data_if[3] == 0xffff:
+		data_i = get_handshake_data(ser.read(6))
+		if data_i[1:3] == init_args and data_i[3] == 0xffff:
 			if init_args[1] != baud: return init(adapter, *init_args, baud = init_args[1])
-			return data_if[0]  # motor_count
-		# TODO: add crc
-		# TODO: when data is not received correctly reset robot arm
+			return data_i[0]  # motor_count
+		# TODO: add crc on both ends
 
 
 
@@ -51,16 +45,44 @@ def run(adapter: str, baud: int = 9600, time_out: int = 10) -> None:
 	ser.reset_output_buffer()
 
 	while True:
-		ser.write(0xe5)
-		length = ser.inWaiting()
-		if length:
-			data = ser.read(length)
-			print(data)
-            #for byte in data:
-			#	print(format(byte, '#010b'), end=" ")
-			#print(end="\n")
-			#print(data.decode("utf-8"))
+		""" # make instruction
+		target = float(input("target (f64, rad): "))
+		max_vel = float(input("max_vel (f64, rad / s): "))
+		max_acc = float(input("max_acc (f64, rad / s^2): "))
+		print(
+			"microstep:",
+			"\t(0) -> MS2",
+			"\t(1) -> MS4",
+			"\t(2) -> MS8",
+			"\t(3) -> MS16",
+			sep="\n"
+		)
+		micro_step = int(input(": "))
+		srd_mode = int(input("srd_mode (1 or 0): "))
+		print(
+			"action (+ to use multiple):",
+			"\t(1) -> EXEC",
+			"\t(2) -> OVERRIDE",
+			"\t(4) -> SYNC",
+			"\t(8) -> POLL",
+			sep="\n"
+		)
+		action = int(input(": "))
+		motor_id = int(input(f"motor_id (0 to {motor_count}): "))
+		instruction = new_instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
+		"""
+
+		instruction = b'ffffff$@\x00\x00\x00\x00\x00\x00\x02@\x00\x00\x00\x00\x00\x00\xf2?[\x00\xff\xff'
+		ser.write(bytes([SYNC_BYTE]))  # sync byte
+		ser.write(instruction)
+
 		time.sleep(.2)
+
+		in_len = ser.inWaiting()
+		if in_len > 27:
+			print(instruction.hex(), ser.read(in_len).hex())
+
+
 
 
 if __name__ == "__main__":

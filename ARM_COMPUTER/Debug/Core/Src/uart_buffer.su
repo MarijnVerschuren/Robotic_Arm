@@ -1,0 +1,5 @@
+../Core/Src/uart_buffer.c:13:12:new_uart_ibuf	24	static
+../Core/Src/uart_buffer.c:24:6:uart_ibuf_reset	16	static
+../Core/Src/uart_buffer.c:29:9:uart_ibuf_increment	16	static
+../Core/Src/uart_buffer.c:36:9:uart_ibuf_align	16	static
+../Core/Src/uart_buffer.c:45:9:uart_ibuf_read	32	static

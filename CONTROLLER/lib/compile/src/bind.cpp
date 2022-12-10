@@ -9,6 +9,8 @@ namespace py = pybind11;
 PYBIND11_MODULE(py_lib, handle) {
 	handle.doc() = "communication module for python using C++";
 
+	handle.attr("SYNC_BYTE") = py::int_(SYNC_BYTE);
+
 	handle.def("new_instruction", [](
 		uint16_t id,
 		uint8_t action,
