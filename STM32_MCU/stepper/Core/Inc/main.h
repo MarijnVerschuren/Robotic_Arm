@@ -59,6 +59,35 @@ typedef struct {
 	} settings;
 	uint16_t crc;  // add crc16?
 } MCU_Instruction;
+
+/* Instruction
+ * motor instruction (includes flags)
+ *//*
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff
+typedef struct {  // uint8_t[28]
+	double		target;			// rad
+	double		max_vel;		// rad / s
+	double		max_acc;		// rad / s^2
+	uint16_t	micro_step: 2;  // microstep setting
+	uint16_t	srd_mode: 1;	// srd mode on the motor controller
+	uint16_t	action: 4;		// look in ACTION enum for possible actions
+	uint16_t	id: 9;			// selected motor
+	uint16_t	crc;			// TODO (not a priority)
+} MCU_Instruction; */
+
+/* State
+ * state of the motor controller
+ *//*
+// 0xffffffff 0xffffffff 0xffffffffffffffffffffffffffffffffffffffff
+typedef struct {
+	struct {  // +- 188,744,040 deg
+		uint32_t sign: 1;
+		uint32_t rotation: 19;
+		uint32_t angle: 12;
+	} pos, target;
+	// TODO: add all skewsin variables to state struct
+	uint8_t reserved[20];
+} MCU_State; */
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -123,6 +152,8 @@ void euler_method();  // typical execution time ~45 us
 /* Private defines -----------------------------------------------------------*/
 #define AS5600_ANALOG_IN_Pin GPIO_PIN_0
 #define AS5600_ANALOG_IN_GPIO_Port GPIOA
+#define STATUS_PIN_Pin GPIO_PIN_2
+#define STATUS_PIN_GPIO_Port GPIOA
 #define INSTUCTION_INT_Pin GPIO_PIN_3
 #define INSTUCTION_INT_GPIO_Port GPIOA
 #define NSS_Pin GPIO_PIN_4
@@ -151,8 +182,6 @@ void euler_method();  // typical execution time ~45 us
 #define AS5600_SCL_GPIO_Port GPIOB
 #define AS5600_SDA_Pin GPIO_PIN_7
 #define AS5600_SDA_GPIO_Port GPIOB
-#define __Pin GPIO_PIN_9
-#define __GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

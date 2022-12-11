@@ -8,7 +8,7 @@ from lib import *
 
 
 # init_args: (init_0, baud)
-def init(adapter: str, *init_args, baud: int = 9600, time_out: int = 10) -> int:
+def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 10) -> int:
 	ser = serial.Serial(
 		port=adapter, baudrate=baud, bytesize=serial.EIGHTBITS,
 		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO,
@@ -18,25 +18,26 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: int = 10) -> int:
 	ser.reset_input_buffer()
 	ser.reset_output_buffer()
 
-	data_o = new_handshake(0, *init_args)
+	data_o = new_CTRL_Handshake(0, *init_args)
+	data_crc = get_CTRL_Handshake_data(data_o)[3]
 	while True:
 		ser.write(bytes([SYNC_BYTE]))  # sync byte
 		ser.write(data_o)
 		if ser.inWaiting() < 6: continue  # no response
-		data_i = get_handshake_data(ser.read(6))
-		if data_i[1:3] == init_args and data_i[3] == 0xffff:
+		data_i = get_CTRL_Handshake_data(ser.read(6))
+		if data_i[1:3] == init_args and data_i[3] == data_crc:
 			if init_args[1] != baud: return init(adapter, *init_args, baud = init_args[1])
 			return data_i[0]  # motor_count
 		# TODO: add crc on both ends
 
 
 
-def run(adapter: str, baud: int = 9600, time_out: int = 10) -> None:
+def run(adapter: str, baud: int = 9600, time_out: float = 10) -> None:
 	motor_count = init(adapter, 1, baud)  # init args: init_0=1, baud=baud
 
 	ser = serial.Serial(
 		port=adapter, baudrate=baud, bytesize=serial.EIGHTBITS,
-		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
+		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO,
 		timeout=time_out
 	)
 
@@ -69,10 +70,11 @@ def run(adapter: str, baud: int = 9600, time_out: int = 10) -> None:
 		)
 		action = int(input(": "))
 		motor_id = int(input(f"motor_id (0 to {motor_count}): "))
-		instruction = new_instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
+		instruction = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
+		print(instruction)
 		"""
 
-		instruction = b'ffffff$@\x00\x00\x00\x00\x00\x00\x02@\x00\x00\x00\x00\x00\x00\xf2?[\x00\xff\xff'
+		instruction = b"\x9a\x99\x99\x99\x99\xf9\x8f@ffffff$@333333\x0b@[\x00\x0e\x83"
 		ser.write(bytes([SYNC_BYTE]))  # sync byte
 		ser.write(instruction)
 

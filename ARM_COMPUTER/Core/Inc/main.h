@@ -31,7 +31,6 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "uart_buffer.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -40,12 +39,12 @@ extern "C" {
  * part of instruction that tells mcu what to do with the provided data
  */
 // 0xf
-enum flags {
+typedef enum {
 	EXEC = 0x01,
 	OVERRIDE = 0x02,
 	SYNC = 0x04,
 	POLL = 0x08
-};
+} FLAGS;
 
 /* Instruction
  * motor instruction (includes flags)
@@ -60,7 +59,21 @@ typedef struct {  // uint8_t[28]
 	uint16_t	action: 4;		// look in ACTION enum for possible actions
 	uint16_t	id: 9;			// selected motor
 	uint16_t	crc;			// TODO (not a priority)
-} instruction;
+} MCU_Instruction;
+
+/* State
+ * state of the motor controller
+ */
+// 0xffffffff 0xffffffff 0xffffffffffffffffffffffffffffffffffffffff
+typedef struct {
+	struct {  // +- 188,744,040 deg
+		uint32_t sign: 1;
+		uint32_t rotation: 19;
+		uint32_t angle: 12;
+	} pos, target;
+	// TODO: add all skewsin variables to state struct
+	uint8_t reserved[20];
+} MCU_State;
 
 /* Handshake
  * this struct is used to establish a handshake between pc and mcu
@@ -77,7 +90,7 @@ typedef struct {  // uint8_t[6]
 	// https://community.st.com/s/question/0D53W00001GkPvRSAV/is-it-possible-to-change-the-baud-rate-of-the-usart-during-run-time-in-stm32-cube-ide
 	uint32_t baud: 26;
 	uint16_t crc;
-} handshake;
+} CTRL_Handshake;  // control handshake
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

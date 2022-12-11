@@ -12,7 +12,7 @@
 
 uart_ibuf* new_uart_ibuf(UART_HandleTypeDef* uart_handle, uint32_t size) {
 	uart_ibuf* handle = (uart_ibuf*)calloc(1, sizeof(uart_ibuf));
-	handle->buffer = malloc(size);
+	handle->buffer = calloc(size, 1);  // array of size len initialized to 0
 	handle->uart_handle = uart_handle;
 	handle->size = size;
 	handle->read = size;  // dma starts writing from end
@@ -24,6 +24,7 @@ uart_ibuf* new_uart_ibuf(UART_HandleTypeDef* uart_handle, uint32_t size) {
 void uart_ibuf_reset(uart_ibuf* handle) {
 	*handle->end = 1024;
 	handle->read = 1024;
+	memset(handle->buffer, 0, handle->size);
 }
 
 uint8_t uart_ibuf_increment(uart_ibuf* handle) {

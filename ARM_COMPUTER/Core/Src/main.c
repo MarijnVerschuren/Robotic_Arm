@@ -27,6 +27,9 @@
 /* USER CODE BEGIN Includes */
 #include <stdlib.h>
 #include <string.h>
+
+#include "uart_buffer.h"
+#include "crc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,23 +95,27 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	RX_data = new_uart_ibuf(&huart2, 1024);  // starts receiving
 
+	// motor_count starts counting from 0
 	uint8_t motor_count = 0;  // TODO: make code to find motor count
 
 	{  // anonymous scope so that temporary variables are cleaned up
 		uint32_t baud = 9600;  // default baud
-		// motor_count starts counting from 0
-		handshake init;
-		memset((void*)&init, 0, 6);  // set to 0
+		CTRL_Handshake init;
 
 		HANDSHAKE:  // jmp to label in the case baud is changed (redo handshake)
 
-		while (init.crc != 0xffff) {  // handshake
+		memset((void*)&init, 0, 6);  // set to 0
+		uint16_t crc = 0xffff;
+
+		while (init.crc != crc) {  // handshake
 			if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
 			if (uart_ibuf_read(RX_data, &init, 6)) { continue; }
-		}  // TODO: add crc validation and fixing
+			crc = crc16_dnp(&init, 4);
+		}  // TODO: add crc error correction
 
-		init.motor_count = motor_count;
+		init.motor_count = motor_count;  // set motor count and send message back
 		HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
+
 		if (init.init_0) {} // TODO: move all motors to their 0 position
 		if (init.baud != baud) {
 			// TODO: set new baud and go back to handshake
@@ -120,15 +127,19 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	instruction inst;
+	uart_ibuf_reset(RX_data);
+	MCU_Instruction instruction;
+	MCU_State state;
 	while (1) {
 		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
-		if (uart_ibuf_read(RX_data, &inst, 28)) { continue; }
-		HAL_UART_Transmit(&huart2, (uint8_t*)&inst, 28, 100);  // 10ms timeout is too little!!!!
-		// TODO: add CRC validation
+		if (uart_ibuf_read(RX_data, &instruction, 28)) { continue; }
+		HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
+		// TODO: CRC verify
 		// TODO: send CRC back only (that'll be enough to verify)
 		// TODO: make messages more flexible for other motor drivers
 		// TODO: send over SPI to the motor controller
+		HAL_SPI_TransmitReceive(&hspi1, &instruction, &state, 28, 100);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

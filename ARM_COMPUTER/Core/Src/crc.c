@@ -1,4 +1,10 @@
-#include "com.hpp"
+/*
+ * crc.c
+ *
+ *  Created on: Dec 11, 2022
+ *      Author: marijn
+ */
+#include "crc.h"
 
 
 
@@ -37,51 +43,6 @@ const uint16_t crc16_dnp_table[256] = {  // 512b
         0xaf91, 0xf1a7, 0x13fd, 0x4dcb, 0xd748, 0x897e, 0x6b24, 0x3512
 };
 
-
-
-uint8_t* new_MCU_Instruction(uint16_t id, uint8_t action, double target, double max_vel, double max_acc, uint8_t micro_step, uint8_t srd_mode) {
-	MCU_Instruction* data =	(MCU_Instruction*)malloc(28);
-	data->target =			target;
-	data->max_vel =			max_vel;
-	data->max_acc =			max_acc;
-	data->micro_step =		micro_step;
-	data->srd_mode =		srd_mode;
-	data->action =			action;
-	data->id =				id;
-	data->crc = 			crc16_dnp(data, 26);
-	return (uint8_t*)data;
-}
-
-void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* id, uint16_t* crc) {
-	MCU_Instruction* data =	(MCU_Instruction*)package;
-	*target =				data->target;
-	*max_vel =				data->max_vel;
-	*max_acc =				data->max_acc;
-	*micro_step =			data->micro_step;
-	*srd_mode =				data->srd_mode;
-	*action =				data->action;
-	*id =					data->id;
-	*crc =					data->crc;
-}
-
-
-uint8_t* new_CTRL_Handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud) {
-	CTRL_Handshake* data =	(CTRL_Handshake*)malloc(6);
-	data->motor_count =		motor_count;
-	data->init_0 =			init_0;
-	data->baud =			baud;
-	data->crc = 			crc16_dnp(data, 4);
-	return (uint8_t*)data;
-}
-
-void get_CTRL_Handshake_data(uint32_t package, uint8_t* motor_count, uint8_t* init_0, uint32_t* baud, uint16_t* crc) {
-	CTRL_Handshake* data =	(CTRL_Handshake*)&package;
-	// in this struct counting starts from 0
-	*motor_count =			data->motor_count;
-	*init_0 =				data->init_0;
-	*baud =					data->baud;
-	*crc =					data->crc;
-}
 
 
 // crc16_dnp was the most error resilient for messages under 130 bytes with a hamming distance of 7!!
