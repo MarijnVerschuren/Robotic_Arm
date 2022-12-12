@@ -35,8 +35,8 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-/* Flags
- * part of instruction that tells mcu what to do with the provided data
+/* ACTION_FLAGS
+ * part of instruction that tells MCU and CTRL what to do with the provided data
  */
 // 0xf
 typedef enum {
@@ -44,8 +44,19 @@ typedef enum {
 	OVERRIDE = 0x02,
 	SYNC = 0x04,
 	POLL = 0x08
-} FLAGS;
+} ACTION_FLAGS;
 
+/* RETURN_CODES
+ * message sent back to PC to tell it how instructions are received
+ */
+// 0x1f
+typedef enum {
+	RETURN_OK = 0x01,
+	RETURN_CRC_FIXED = 0x02,
+	RETURN_CRC_ERROR = 0x04,
+	RETURN_ERROR_FIXED = 0x08,  // fixed invalid instruction
+	RETURN_ERROR = 0x10
+} RETURN_FLAGS;
 /* Instruction
  * motor instruction (includes flags)
  */

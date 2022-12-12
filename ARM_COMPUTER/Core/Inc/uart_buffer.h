@@ -22,7 +22,7 @@ typedef struct {
 } uart_ibuf;
 
 
-uart_ibuf* new_uart_input_buffer(UART_HandleTypeDef* uart_handle, uint32_t size);
+uart_ibuf* new_uart_ibuf(UART_HandleTypeDef* uart_handle, uint32_t size);
 void uart_ibuf_reset(uart_ibuf* handle);
 
 uint8_t uart_ibuf_increment(uart_ibuf* handle);

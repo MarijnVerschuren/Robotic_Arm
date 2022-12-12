@@ -17,15 +17,23 @@ extern const uint16_t crc16_dnp_table[256];
 // 0xf
 enum ACTION_FLAGS : uint8_t {
 	// exec move
-	EXEC = 0x01,
+	EXEC = 0x1,
 	// abort move currently executing in the motor and replacing it with the attached move (if EXEC is set) (IF EXEC is not set the move will only be aborted)
 	// if override is not set the move is put into a queue on the motor driver mcu
-	OVERRIDE = 0x02,
+	OVERRIDE = 0x2,
 	// make movement synced with the next
 	// movements that should be synced will wait on the motor driver mcu untill the sync pin is set low
-	SYNC = 0x04,
+	SYNC = 0x4,
 	// poll motor position (if SYNC is set the mcu will return with all other poll events at once)
-	POLL = 0x08
+	POLL = 0x8
+};
+
+enum RETURN_FLAGS : uint8_t {
+	OK = 0x01,
+	CRC_FIXED = 0x02,
+	CRC_ERROR = 0x04,
+	ERROR_FIXED = 0x08,  // fixed invalid instruction
+	ERROR = 0x10
 };
 
 /* Instruction

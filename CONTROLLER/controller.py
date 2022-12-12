@@ -8,7 +8,7 @@ from lib import *
 
 
 # init_args: (init_0, baud)
-def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 10) -> int:
+def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> int:
 	ser = serial.Serial(
 		port=adapter, baudrate=baud, bytesize=serial.EIGHTBITS,
 		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO,
@@ -28,11 +28,10 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 10) -> in
 		if data_i[1:3] == init_args and data_i[3] == data_crc:
 			if init_args[1] != baud: return init(adapter, *init_args, baud = init_args[1])
 			return data_i[0]  # motor_count
-		# TODO: add crc on both ends
 
 
 
-def run(adapter: str, baud: int = 9600, time_out: float = 10) -> None:
+def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 	motor_count = init(adapter, 1, baud)  # init args: init_0=1, baud=baud
 
 	ser = serial.Serial(
@@ -46,6 +45,7 @@ def run(adapter: str, baud: int = 9600, time_out: float = 10) -> None:
 	ser.reset_output_buffer()
 
 	while True:
+		input("send: ")
 		""" # make instruction
 		target = float(input("target (f64, rad): "))
 		max_vel = float(input("max_vel (f64, rad / s): "))
@@ -73,16 +73,14 @@ def run(adapter: str, baud: int = 9600, time_out: float = 10) -> None:
 		instruction = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
 		print(instruction)
 		"""
+		return_code = 0
+		while (not return_code & RETURN_FLAGS.OK):
+			instruction = b"\x9a\x99\x99\x99\x99\xf9\x8f@ffffff$@333333\x0b@[\x00\x0e\x83"
+			ser.write(bytes([SYNC_BYTE]))  # sync byte
+			ser.write(instruction)
 
-		instruction = b"\x9a\x99\x99\x99\x99\xf9\x8f@ffffff$@333333\x0b@[\x00\x0e\x83"
-		ser.write(bytes([SYNC_BYTE]))  # sync byte
-		ser.write(instruction)
-
-		time.sleep(.2)
-
-		in_len = ser.inWaiting()
-		if in_len > 27:
-			print(instruction.hex(), ser.read(in_len).hex())
+			return_code = int.from_bytes(ser.read(1), "little")
+			print(return_code)
 
 
 

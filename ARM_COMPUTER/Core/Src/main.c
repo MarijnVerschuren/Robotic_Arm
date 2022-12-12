@@ -111,12 +111,12 @@ int main(void)
 			if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
 			if (uart_ibuf_read(RX_data, &init, 6)) { continue; }
 			crc = crc16_dnp(&init, 4);
-		}  // TODO: add crc error correction
+		}  // TODO: add CRC error correction
 
 		init.motor_count = motor_count;  // set motor count and send message back
 		HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
 
-		if (init.init_0) {} // TODO: move all motors to their 0 position
+		if (init.init_0) {}  // TODO: move all motors to their 0 position
 		if (init.baud != baud) {
 			// TODO: set new baud and go back to handshake
 			baud = init.baud;
@@ -127,19 +127,37 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	// HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
+
 	uart_ibuf_reset(RX_data);
 	MCU_Instruction instruction;
 	MCU_State state;
+	uint8_t return_code;
 	while (1) {
 		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
 		if (uart_ibuf_read(RX_data, &instruction, 28)) { continue; }
-		HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
-		// TODO: CRC verify
-		// TODO: send CRC back only (that'll be enough to verify)
-		// TODO: make messages more flexible for other motor drivers
-		// TODO: send over SPI to the motor controller
-		HAL_SPI_TransmitReceive(&hspi1, &instruction, &state, 28, 100);
 
+		return_code = 0;
+		if (instruction.crc != crc16_dnp(&instruction, 26)) {
+			// TODO: error correction
+			// if not fix-able \/
+			return_code |= RETURN_CRC_ERROR;
+			HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
+			continue;  // do not execute instruction
+		}
+		// TODO: check if instruction is valid, and try fixing it
+		// return_code |= RETURN_ERROR;
+		// HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
+		// continue;
+		// if not valid ^
+		// if fixed \/
+		// return_code |= RETURN_ERROR_FIXED;
+		return_code |= RETURN_OK;
+		HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
+
+		// TODO: make messages more flexible for other motor drivers
+		// TODO: test this
+		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 28, 100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

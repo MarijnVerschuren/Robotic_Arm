@@ -37,7 +37,7 @@ PYBIND11_MODULE(py_lib, handle) {
 		get_MCU_Instruction_data((uint8_t*)handshake, &target, &max_vel, &max_acc, &micro_step, &srd_mode, &action, &id, &crc);
 		return std::make_tuple(target, max_vel, max_acc, micro_step, srd_mode, action, id, crc);
 	});
-	
+
 	// overload handshake functions so that bytes like object can be passed
 	handle.def("new_CTRL_Handshake", [](uint8_t motor_count, uint8_t init_0, uint32_t baud) {
 		uint8_t* data = new_CTRL_Handshake(motor_count, init_0, baud);
@@ -58,10 +58,18 @@ PYBIND11_MODULE(py_lib, handle) {
 		return crc16_dnp(data.c_str(), data.length());
 	});
 
-	py::enum_<ACTION_FLAGS> flags_py(handle, "ACTION_FLAGS", py::arithmetic());
-	flags_py.attr("EXEC") =		ACTION_FLAGS::EXEC;
-	flags_py.attr("OVERRIDE") =	ACTION_FLAGS::OVERRIDE;
-	flags_py.attr("SYNC") =		ACTION_FLAGS::SYNC;
-	flags_py.attr("POLL") =		ACTION_FLAGS::POLL;
-	flags_py.export_values();
+	py::enum_<ACTION_FLAGS> action_flags_py(handle, "ACTION_FLAGS", py::arithmetic());
+	action_flags_py.attr("EXEC") =			ACTION_FLAGS::EXEC;
+	action_flags_py.attr("OVERRIDE") =		ACTION_FLAGS::OVERRIDE;
+	action_flags_py.attr("SYNC") =			ACTION_FLAGS::SYNC;
+	action_flags_py.attr("POLL") =			ACTION_FLAGS::POLL;
+	action_flags_py.export_values();
+
+	py::enum_<RETURN_FLAGS> return_flags_py(handle, "RETURN_FLAGS", py::arithmetic());
+	return_flags_py.attr("OK") =			RETURN_FLAGS::OK;
+	return_flags_py.attr("CRC_FIXED") =		RETURN_FLAGS::CRC_FIXED;
+	return_flags_py.attr("CRC_ERROR") =		RETURN_FLAGS::CRC_ERROR;
+	return_flags_py.attr("ERROR_FIXED") =	RETURN_FLAGS::ERROR_FIXED;
+	return_flags_py.attr("ERROR") =			RETURN_FLAGS::ERROR;
+	return_flags_py.export_values();
 }

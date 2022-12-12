@@ -37,17 +37,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  16 .debug_rnglists 00000fde  00000000  00000000  0003e560  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_macro  00018a31  00000000  00000000  0003f53e  2**0
+ 17 .debug_macro  00018a3a  00000000  00000000  0003f53e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_line   0001577b  00000000  00000000  00057f6f  2**0
+ 18 .debug_line   0001577e  00000000  00000000  00057f78  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .debug_str    0009c530  00000000  00000000  0006d6ea  2**0
+ 19 .debug_str    0009c542  00000000  00000000  0006d6f6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 20 .debug_frame  00004f40  00000000  00000000  00109c1c  2**2
+ 20 .debug_frame  00004f40  00000000  00000000  00109c38  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000144  00000000  00000000  0010eb5c  2**0
+ 21 .debug_line_str 00000144  00000000  00000000  0010eb78  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 22 .debug_loclists 00001221  00000000  00000000  0010eca0  2**0
+ 22 .debug_loclists 00001221  00000000  00000000  0010ecbc  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2313,121 +2313,121 @@ void MX_GPIO_Init(void)
  8001494:	683b      	ldr	r3, [r7, #0]
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, GPIO_PIN_SET);
- 8001496:	2201      	movs	r2, #1
- 8001498:	f44f 5180 	mov.w	r1, #4096	; 0x1000
+  HAL_GPIO_WritePin(GPIOA, STATUS_PIN_Pin|STEPPER_MS2_Pin|STEPPER_MS1_Pin, GPIO_PIN_RESET);
+ 8001496:	2200      	movs	r2, #0
+ 8001498:	f44f 7141 	mov.w	r1, #772	; 0x304
  800149c:	483c      	ldr	r0, [pc, #240]	; (8001590 <MX_GPIO_Init+0x164>)
  800149e:	f002 fda9 	bl	8003ff4 <HAL_GPIO_WritePin>
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, STEPPER_STP_Pin|STEPPER_DIR_Pin|STEPPER_SRD_Pin|AS5600_DIR_Pin, GPIO_PIN_RESET);
- 80014a2:	2200      	movs	r2, #0
- 80014a4:	f24e 0120 	movw	r1, #57376	; 0xe020
- 80014a8:	4839      	ldr	r0, [pc, #228]	; (8001590 <MX_GPIO_Init+0x164>)
+  HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, GPIO_PIN_SET);
+ 80014a2:	2201      	movs	r2, #1
+ 80014a4:	f44f 5180 	mov.w	r1, #4096	; 0x1000
+ 80014a8:	483a      	ldr	r0, [pc, #232]	; (8001594 <MX_GPIO_Init+0x168>)
  80014aa:	f002 fda3 	bl	8003ff4 <HAL_GPIO_WritePin>
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, STEPPER_MS2_Pin|STEPPER_MS1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, STEPPER_STP_Pin|STEPPER_DIR_Pin|STEPPER_SRD_Pin|AS5600_DIR_Pin, GPIO_PIN_RESET);
  80014ae:	2200      	movs	r2, #0
- 80014b0:	f44f 7140 	mov.w	r1, #768	; 0x300
+ 80014b0:	f24e 0120 	movw	r1, #57376	; 0xe020
  80014b4:	4837      	ldr	r0, [pc, #220]	; (8001594 <MX_GPIO_Init+0x168>)
  80014b6:	f002 fd9d 	bl	8003ff4 <HAL_GPIO_WritePin>
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = INSTUCTION_INT_Pin;
- 80014ba:	2308      	movs	r3, #8
+  GPIO_InitStruct.Pin = STATUS_PIN_Pin;
+ 80014ba:	2304      	movs	r3, #4
  80014bc:	60fb      	str	r3, [r7, #12]
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
- 80014be:	f44f 1388 	mov.w	r3, #1114112	; 0x110000
- 80014c2:	613b      	str	r3, [r7, #16]
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 80014be:	2301      	movs	r3, #1
+ 80014c0:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Pull = GPIO_NOPULL;
- 80014c4:	2300      	movs	r3, #0
- 80014c6:	617b      	str	r3, [r7, #20]
+ 80014c2:	2300      	movs	r3, #0
+ 80014c4:	617b      	str	r3, [r7, #20]
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 80014c6:	2300      	movs	r3, #0
+ 80014c8:	61bb      	str	r3, [r7, #24]
+  HAL_GPIO_Init(STATUS_PIN_GPIO_Port, &GPIO_InitStruct);
+ 80014ca:	f107 030c 	add.w	r3, r7, #12
+ 80014ce:	4619      	mov	r1, r3
+ 80014d0:	482f      	ldr	r0, [pc, #188]	; (8001590 <MX_GPIO_Init+0x164>)
+ 80014d2:	f002 fc0b 	bl	8003cec <HAL_GPIO_Init>
+
+  /*Configure GPIO pin : PtPin */
+  GPIO_InitStruct.Pin = INSTUCTION_INT_Pin;
+ 80014d6:	2308      	movs	r3, #8
+ 80014d8:	60fb      	str	r3, [r7, #12]
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+ 80014da:	f44f 1388 	mov.w	r3, #1114112	; 0x110000
+ 80014de:	613b      	str	r3, [r7, #16]
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 80014e0:	2300      	movs	r3, #0
+ 80014e2:	617b      	str	r3, [r7, #20]
   HAL_GPIO_Init(INSTUCTION_INT_GPIO_Port, &GPIO_InitStruct);
- 80014c8:	f107 030c 	add.w	r3, r7, #12
- 80014cc:	4619      	mov	r1, r3
- 80014ce:	4831      	ldr	r0, [pc, #196]	; (8001594 <MX_GPIO_Init+0x168>)
- 80014d0:	f002 fc0c 	bl	8003cec <HAL_GPIO_Init>
+ 80014e4:	f107 030c 	add.w	r3, r7, #12
+ 80014e8:	4619      	mov	r1, r3
+ 80014ea:	4829      	ldr	r0, [pc, #164]	; (8001590 <MX_GPIO_Init+0x164>)
+ 80014ec:	f002 fbfe 	bl	8003cec <HAL_GPIO_Init>
 
   /*Configure GPIO pins : PBPin PBPin */
   GPIO_InitStruct.Pin = STEPPER_NEN_Pin|STEPPER_DIR_Pin;
- 80014d4:	f44f 43a0 	mov.w	r3, #20480	; 0x5000
- 80014d8:	60fb      	str	r3, [r7, #12]
+ 80014f0:	f44f 43a0 	mov.w	r3, #20480	; 0x5000
+ 80014f4:	60fb      	str	r3, [r7, #12]
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
- 80014da:	2311      	movs	r3, #17
- 80014dc:	613b      	str	r3, [r7, #16]
+ 80014f6:	2311      	movs	r3, #17
+ 80014f8:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Pull = GPIO_NOPULL;
- 80014de:	2300      	movs	r3, #0
- 80014e0:	617b      	str	r3, [r7, #20]
+ 80014fa:	2300      	movs	r3, #0
+ 80014fc:	617b      	str	r3, [r7, #20]
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
- 80014e2:	2302      	movs	r3, #2
- 80014e4:	61bb      	str	r3, [r7, #24]
+ 80014fe:	2302      	movs	r3, #2
+ 8001500:	61bb      	str	r3, [r7, #24]
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
- 80014e6:	f107 030c 	add.w	r3, r7, #12
- 80014ea:	4619      	mov	r1, r3
- 80014ec:	4828      	ldr	r0, [pc, #160]	; (8001590 <MX_GPIO_Init+0x164>)
- 80014ee:	f002 fbfd 	bl	8003cec <HAL_GPIO_Init>
+ 8001502:	f107 030c 	add.w	r3, r7, #12
+ 8001506:	4619      	mov	r1, r3
+ 8001508:	4822      	ldr	r0, [pc, #136]	; (8001594 <MX_GPIO_Init+0x168>)
+ 800150a:	f002 fbef 	bl	8003cec <HAL_GPIO_Init>
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = STEPPER_STP_Pin;
- 80014f2:	f44f 5300 	mov.w	r3, #8192	; 0x2000
- 80014f6:	60fb      	str	r3, [r7, #12]
+ 800150e:	f44f 5300 	mov.w	r3, #8192	; 0x2000
+ 8001512:	60fb      	str	r3, [r7, #12]
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
- 80014f8:	2311      	movs	r3, #17
- 80014fa:	613b      	str	r3, [r7, #16]
+ 8001514:	2311      	movs	r3, #17
+ 8001516:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Pull = GPIO_NOPULL;
- 80014fc:	2300      	movs	r3, #0
- 80014fe:	617b      	str	r3, [r7, #20]
+ 8001518:	2300      	movs	r3, #0
+ 800151a:	617b      	str	r3, [r7, #20]
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
- 8001500:	2303      	movs	r3, #3
- 8001502:	61bb      	str	r3, [r7, #24]
+ 800151c:	2303      	movs	r3, #3
+ 800151e:	61bb      	str	r3, [r7, #24]
   HAL_GPIO_Init(STEPPER_STP_GPIO_Port, &GPIO_InitStruct);
- 8001504:	f107 030c 	add.w	r3, r7, #12
- 8001508:	4619      	mov	r1, r3
- 800150a:	4821      	ldr	r0, [pc, #132]	; (8001590 <MX_GPIO_Init+0x164>)
- 800150c:	f002 fbee 	bl	8003cec <HAL_GPIO_Init>
+ 8001520:	f107 030c 	add.w	r3, r7, #12
+ 8001524:	4619      	mov	r1, r3
+ 8001526:	481b      	ldr	r0, [pc, #108]	; (8001594 <MX_GPIO_Init+0x168>)
+ 8001528:	f002 fbe0 	bl	8003cec <HAL_GPIO_Init>
 
   /*Configure GPIO pin : PtPin */
   GPIO_InitStruct.Pin = STEPPER_SRD_Pin;
- 8001510:	f44f 4300 	mov.w	r3, #32768	; 0x8000
- 8001514:	60fb      	str	r3, [r7, #12]
+ 800152c:	f44f 4300 	mov.w	r3, #32768	; 0x8000
+ 8001530:	60fb      	str	r3, [r7, #12]
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
- 8001516:	2311      	movs	r3, #17
- 8001518:	613b      	str	r3, [r7, #16]
+ 8001532:	2311      	movs	r3, #17
+ 8001534:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Pull = GPIO_NOPULL;
- 800151a:	2300      	movs	r3, #0
- 800151c:	617b      	str	r3, [r7, #20]
+ 8001536:	2300      	movs	r3, #0
+ 8001538:	617b      	str	r3, [r7, #20]
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
- 800151e:	2301      	movs	r3, #1
- 8001520:	61bb      	str	r3, [r7, #24]
+ 800153a:	2301      	movs	r3, #1
+ 800153c:	61bb      	str	r3, [r7, #24]
   HAL_GPIO_Init(STEPPER_SRD_GPIO_Port, &GPIO_InitStruct);
- 8001522:	f107 030c 	add.w	r3, r7, #12
- 8001526:	4619      	mov	r1, r3
- 8001528:	4819      	ldr	r0, [pc, #100]	; (8001590 <MX_GPIO_Init+0x164>)
- 800152a:	f002 fbdf 	bl	8003cec <HAL_GPIO_Init>
+ 800153e:	f107 030c 	add.w	r3, r7, #12
+ 8001542:	4619      	mov	r1, r3
+ 8001544:	4813      	ldr	r0, [pc, #76]	; (8001594 <MX_GPIO_Init+0x168>)
+ 8001546:	f002 fbd1 	bl	8003cec <HAL_GPIO_Init>
 
   /*Configure GPIO pins : PAPin PAPin */
   GPIO_InitStruct.Pin = STEPPER_MS2_Pin|STEPPER_MS1_Pin;
- 800152e:	f44f 7340 	mov.w	r3, #768	; 0x300
- 8001532:	60fb      	str	r3, [r7, #12]
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
- 8001534:	2311      	movs	r3, #17
- 8001536:	613b      	str	r3, [r7, #16]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
- 8001538:	2300      	movs	r3, #0
- 800153a:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
- 800153c:	2301      	movs	r3, #1
- 800153e:	61bb      	str	r3, [r7, #24]
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
- 8001540:	f107 030c 	add.w	r3, r7, #12
- 8001544:	4619      	mov	r1, r3
- 8001546:	4813      	ldr	r0, [pc, #76]	; (8001594 <MX_GPIO_Init+0x168>)
- 8001548:	f002 fbd0 	bl	8003cec <HAL_GPIO_Init>
-
-  /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = AS5600_DIR_Pin;
- 800154c:	2320      	movs	r3, #32
+ 800154a:	f44f 7340 	mov.w	r3, #768	; 0x300
  800154e:	60fb      	str	r3, [r7, #12]
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
  8001550:	2311      	movs	r3, #17
@@ -2435,40 +2435,42 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
  8001554:	2300      	movs	r3, #0
  8001556:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
- 8001558:	2300      	movs	r3, #0
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+ 8001558:	2301      	movs	r3, #1
  800155a:	61bb      	str	r3, [r7, #24]
-  HAL_GPIO_Init(AS5600_DIR_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
  800155c:	f107 030c 	add.w	r3, r7, #12
  8001560:	4619      	mov	r1, r3
  8001562:	480b      	ldr	r0, [pc, #44]	; (8001590 <MX_GPIO_Init+0x164>)
  8001564:	f002 fbc2 	bl	8003cec <HAL_GPIO_Init>
 
   /*Configure GPIO pin : PtPin */
-  GPIO_InitStruct.Pin = __Pin;
- 8001568:	f44f 7300 	mov.w	r3, #512	; 0x200
- 800156c:	60fb      	str	r3, [r7, #12]
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
- 800156e:	2300      	movs	r3, #0
- 8001570:	613b      	str	r3, [r7, #16]
+  GPIO_InitStruct.Pin = AS5600_DIR_Pin;
+ 8001568:	2320      	movs	r3, #32
+ 800156a:	60fb      	str	r3, [r7, #12]
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+ 800156c:	2311      	movs	r3, #17
+ 800156e:	613b      	str	r3, [r7, #16]
   GPIO_InitStruct.Pull = GPIO_NOPULL;
- 8001572:	2300      	movs	r3, #0
- 8001574:	617b      	str	r3, [r7, #20]
-  HAL_GPIO_Init(__GPIO_Port, &GPIO_InitStruct);
- 8001576:	f107 030c 	add.w	r3, r7, #12
- 800157a:	4619      	mov	r1, r3
- 800157c:	4804      	ldr	r0, [pc, #16]	; (8001590 <MX_GPIO_Init+0x164>)
- 800157e:	f002 fbb5 	bl	8003cec <HAL_GPIO_Init>
+ 8001570:	2300      	movs	r3, #0
+ 8001572:	617b      	str	r3, [r7, #20]
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 8001574:	2300      	movs	r3, #0
+ 8001576:	61bb      	str	r3, [r7, #24]
+  HAL_GPIO_Init(AS5600_DIR_GPIO_Port, &GPIO_InitStruct);
+ 8001578:	f107 030c 	add.w	r3, r7, #12
+ 800157c:	4619      	mov	r1, r3
+ 800157e:	4805      	ldr	r0, [pc, #20]	; (8001594 <MX_GPIO_Init+0x168>)
+ 8001580:	f002 fbb4 	bl	8003cec <HAL_GPIO_Init>
 
 }
- 8001582:	bf00      	nop
- 8001584:	3720      	adds	r7, #32
- 8001586:	46bd      	mov	sp, r7
- 8001588:	bd80      	pop	{r7, pc}
- 800158a:	bf00      	nop
+ 8001584:	bf00      	nop
+ 8001586:	3720      	adds	r7, #32
+ 8001588:	46bd      	mov	sp, r7
+ 800158a:	bd80      	pop	{r7, pc}
  800158c:	40023800 	.word	0x40023800
- 8001590:	40020400 	.word	0x40020400
- 8001594:	40020000 	.word	0x40020000
+ 8001590:	40020000 	.word	0x40020000
+ 8001594:	40020400 	.word	0x40020400
 
 08001598 <MX_I2C1_Init>:
 
