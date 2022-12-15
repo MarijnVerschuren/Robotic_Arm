@@ -98,7 +98,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 	if (target_delta != 0) {
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
-		step_gain = MIN(ABS((double)target_delta / 1024), MIN(ABS(((double)target_delta + 1024) / 1024), ABS(((double)target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		step_gain = 5;// MAX(ABS(4096 / (double)target_delta), 1);
+		//step_gain = MIN(ABS((double)target_delta / 1024), MIN(ABS(((double)target_delta + 1024) / 1024), ABS(((double)target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
 		// optimize this or change the function
 	} else { step_gain = 0; }
 	return;
@@ -180,7 +181,7 @@ int main(void)
 	while (1) {
 		if (step_gain < MIN_STEPPER_GAIN) { continue; }  // make sure that the step delay is never greater than 0.75 s
 		// dir is set in interrupt
-		register uint16_t pulse_delay = MIN_STEPPER_DELAY / step_gain;
+		register uint16_t pulse_delay = MIN_STEPPER_DELAY * step_gain;
 		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 1);
 		delay_us(pulse_delay);
 		HAL_GPIO_WritePin(STEPPER_STP_GPIO_Port, STEPPER_STP_Pin, 0);

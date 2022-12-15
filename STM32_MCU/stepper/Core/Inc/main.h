@@ -164,24 +164,26 @@ void euler_method();  // typical execution time ~45 us
 #define MISO_GPIO_Port GPIOA
 #define MOSI_Pin GPIO_PIN_7
 #define MOSI_GPIO_Port GPIOA
-#define STEPPER_NEN_Pin GPIO_PIN_12
-#define STEPPER_NEN_GPIO_Port GPIOB
+#define STEPPER_DIR_Pin GPIO_PIN_12
+#define STEPPER_DIR_GPIO_Port GPIOB
 #define STEPPER_STP_Pin GPIO_PIN_13
 #define STEPPER_STP_GPIO_Port GPIOB
-#define STEPPER_DIR_Pin GPIO_PIN_14
-#define STEPPER_DIR_GPIO_Port GPIOB
-#define STEPPER_SRD_Pin GPIO_PIN_15
+#define STEPPER_SRD_Pin GPIO_PIN_14
 #define STEPPER_SRD_GPIO_Port GPIOB
-#define STEPPER_MS2_Pin GPIO_PIN_8
-#define STEPPER_MS2_GPIO_Port GPIOA
-#define STEPPER_MS1_Pin GPIO_PIN_9
+#define STEPPER_MS2_Pin GPIO_PIN_15
+#define STEPPER_MS2_GPIO_Port GPIOB
+#define STEPPER_MS1_Pin GPIO_PIN_8
 #define STEPPER_MS1_GPIO_Port GPIOA
+#define STEPPER_NEN_Pin GPIO_PIN_9
+#define STEPPER_NEN_GPIO_Port GPIOA
 #define AS5600_DIR_Pin GPIO_PIN_5
 #define AS5600_DIR_GPIO_Port GPIOB
 #define AS5600_SCL_Pin GPIO_PIN_6
 #define AS5600_SCL_GPIO_Port GPIOB
 #define AS5600_SDA_Pin GPIO_PIN_7
 #define AS5600_SDA_GPIO_Port GPIOB
+#define __Pin GPIO_PIN_9
+#define __GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

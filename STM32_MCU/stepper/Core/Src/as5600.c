@@ -23,7 +23,8 @@ HAL_StatusTypeDef AS5600_init(AS5600_TypeDef* handle) {
 	if (AS5600_set_fast_filter_threshold(handle, handle->fast_filter_threshold) != HAL_OK)		{ return HAL_ERROR; }
 	if (AS5600_set_watchdog_timer(handle, handle->watchdog_timer) != HAL_OK)					{ return HAL_ERROR; }
 	
-	if (AS5600_write_config_register(handle) != HAL_OK)											{ return HAL_ERROR; }
+	HAL_StatusTypeDef stat = AS5600_write_config_register(handle);
+	if (stat != HAL_OK)											{ return HAL_ERROR; }
     uint8_t magnet_status = 0;
 	if (AS5600_get_magnet_status(handle, &magnet_status) != HAL_OK)								{ return HAL_ERROR; }
 	if (!(magnet_status & AS5600_MAGNET_DETECTED) \
