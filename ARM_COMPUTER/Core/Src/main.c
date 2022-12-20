@@ -128,17 +128,33 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	// HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
-
 	uart_ibuf_reset(RX_data);
 	MCU_Instruction instruction;
 	MCU_State state;
 	uint8_t return_code;
+
+	instruction.target = 2000;
+	instruction.max_vel = 1;
+	instruction.max_acc = 1;
+	instruction.micro_step = 3;
+	instruction.srd_mode = 0;
+	instruction.action = 0xf;  // all
+	instruction.dir = 0;  // fastest
+	instruction.id = 0;
+	instruction.instrution_id = 0;
+	instruction.crc = crc16_dnp(&instruction, 30);
+
+	HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
+	HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
+	HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+
+
 	while (1) {
 		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
-		if (uart_ibuf_read(RX_data, &instruction, 28)) { continue; }
+		if (uart_ibuf_read(RX_data, &instruction, 32)) { continue; }
 
 		return_code = 0;
-		if (instruction.crc != crc16_dnp(&instruction, 26)) {
+		if (instruction.crc != crc16_dnp(&instruction, 30)) {
 			// TODO: error correction
 			// if not fix-able \/
 			return_code |= RETURN_CRC_ERROR;
@@ -155,9 +171,17 @@ int main(void)
 		return_code |= RETURN_OK;
 		HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
 
-		// TODO: make messages more flexible for other motor drivers
 		// TODO: test this
-		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 28, 100);
+		// TODO: make messages more flexible for other motor drivers
+		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
+		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
+		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+
+		if (instruction.action & POLL) {
+			return_code = SYNC_BYTE;
+			HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
+			HAL_UART_Transmit(&huart2, (uint8_t*)&state, 32, 100);
+		}
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

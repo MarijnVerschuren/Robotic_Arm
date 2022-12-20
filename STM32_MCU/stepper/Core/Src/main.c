@@ -29,22 +29,14 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-MCU_State			state;  // structure that contains the current state of important variables
-MCU_Instruction		instruction;
-AS5600_TypeDef*		sensor;
+MCU_State					state;					// structure that contains the current state of important variables
+volatile MCU_Instruction*	instruction = queue;	// pointer to current instruction in queue
+volatile MCU_Instruction	queue[MAX_QUEUE_SIZE];	// 1kb (max 256 indexes)
+volatile MCU_Instruction	instruction_input;		// instruction directly received from SPI (this will be put into queue if there is space)
+AS5600_TypeDef*				sensor;
 
-volatile uint16_t	AS5600_analog;		// variable for angles received by ADC (automatic: dma)
-uint16_t			AS5600_prev;		// variable that stores the last measurement
-double				AS5600_pos_f64;
-uint16_t			AS5600_pos;
-int16_t				AS5600_delta_pos;
-
-double				step_gain;	// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
-
-// define the following two in a struct received from spi
-uint16_t			target = 2000;
-int16_t				target_delta;
-// <\>
+volatile double				AS5600_pos_f64;			// accumulator
+volatile double				step_gain;				// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -58,28 +50,42 @@ void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
 void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
 void set_motor_setting(MCU_Instruction* instruction) {
 	GPIOA->ODR &= RST;
-	switch(instruction->settings.micro_step) {
+	switch(instruction->micro_step) {
 	case 0: GPIOA->ODR |= M2; break;
 	case 1: GPIOA->ODR |= M4; break;
 	case 2: GPIOA->ODR |= M8; break;  // default is 1/8 micro stepping
 	case 3: GPIOA->ODR |= M16; break;
 	}
-	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->settings.spread_mode);
+	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->srd_mode);
 }
 void euler_method() {  // typical execution time ~45 us
+	register uint16_t pos_diff = (AS5600_pos_f64 - state.raw_angle);  // rotation detection
+	state.pos.rotation += pos_diff > 2048; state.pos.rotation += pos_diff < -2048;
 	register double alpha = 1 / ((EULER_TAU / TIM5->CNT) + 1);
-	AS5600_pos_f64 = (AS5600_analog * alpha) + ((1 - alpha) * AS5600_pos_f64);
-	AS5600_delta_pos = (uint16_t)AS5600_pos_f64 - AS5600_pos;
-	AS5600_pos = (uint16_t)AS5600_pos_f64;
+	AS5600_pos_f64 = (state.raw_angle * alpha) + ((1 - alpha) * AS5600_pos_f64);
+	state.vel = (1e6 / TIM5->CNT) * ((uint16_t)AS5600_pos_f64 - state.pos.angle) * AS5600_RAD_CONV;  // rad / s
+	state.pos.angle = (uint16_t)AS5600_pos_f64;
 	TIM5->CNT = 0;
+}
+void* get_next_empty_queue_ptr() {
+	if (state.queue_size == MAX_QUEUE_SIZE) { return 0; }  // nullptr if full
+	void* ptr = &queue[(state.queue_index + state.queue_size) % MAX_QUEUE_SIZE];
+	state.queue_size++; return ptr;
+}
+void* get_next_queue_ptr() {
+	if (!state.queue_size) { return; }  // check if there is a new instruction in the queue
+	state.queue_index = (state.queue_index + 1) % MAX_QUEUE_SIZE;
+	state.queue_size--;
+	return &queue[state.queue_index];
 }
 
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	if (htim != &htim10) { return; }
+	if (state.queue_size == 0) { return; }
 	//if (pre_euler_func) { (*pre_euler_func)(); }
-	euler_method();  // update AS5600_pos, AS5600_delta_pos using the selected mode
-	target_delta = target - AS5600_pos;
+	euler_method();  // update state.pos.angle, AS5600_delta_pos using the selected mode
+	double target_delta = instruction->target - state.pos.angle;
 	target_delta = ABS(target_delta) < ABS(target_delta - 4096) ? target_delta : target_delta - 4096;
 
 	// TODO: buffer older measurements
@@ -96,12 +102,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	// TODO: delete / re-do: pathfinding code
 	// TODO: tune interrupt timing
 
-	if (target_delta != 0) {
+	if (target_delta < 10) {  // ~1 deg
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
-		step_gain = MIN(ABS((double)target_delta / 1024), MIN(ABS(((double)target_delta + 1024) / 1024), ABS(((double)target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		step_gain = MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
 		// optimize this or change the function
-	} else { step_gain = 0; }
+	} else {
+		instruction = get_next_queue_ptr();  // decrements queue_size and increments queue_index
+		step_gain = 0;
+	}
 	return;
+}
+
+void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
+	// only hspi1 is used so there is no need to check
+	void* dst = get_next_empty_queue_ptr();  // increments queue_size
+	if (!dst) { return; }  // exit if queue is full
+	memcpy(dst, &instruction_input, sizeof(MCU_Instruction));
+	set_motor_setting(instruction);
 }
 /* USER CODE END 0 */
 
@@ -143,15 +160,23 @@ int main(void)
   MX_TIM5_Init();
   MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
-	HAL_TIM_Base_Start(&htim2);  // start timer_2
-	HAL_TIM_Base_Start(&htim5);  // start timer_5
+	// disable motor driver
+	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
+
 	// initialize AS5600 sensor
 	while (AS5600_init(sensor) != HAL_OK) {}  // the sensor has to be on for the code to work
 
-	// initialize the AS5600 position variable
-	AS5600_get_angle(sensor, &AS5600_pos);
-	AS5600_pos_f64 =	AS5600_pos;  // set the current angle to the most accurate value for the euler method
-	AS5600_analog =		AS5600_pos;
+	state.vel = 0.0;
+	state.acc = 0.0;
+	state.instrution_id = 0;
+	state.queue_size = 0;
+	state.queue_index = 0;
+	state.micro_step = 0;
+	state.srd_mode = 0;
+	// initialize the state struct using AS5600 position values
+	AS5600_get_angle(sensor, &state.raw_angle);
+	state.pos.angle =	state.raw_angle;
+	AS5600_pos_f64 =	state.raw_angle;  // set the current angle to the most accurate value for the euler method
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -163,19 +188,23 @@ int main(void)
 	HAL_SPI_Transmit_DMA(&hspi1, (uint8_t*)&state, 16);  // start data receiving loop
 	*/
 
-	// start receiving ADC data
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&AS5600_analog, 1);
+	// TODO: use flag pin to tell CTRL where MCU is in initialization cycle
+	// start communication with CTRL
+	HAL_TIM_Base_Start(&htim2);  // start timer_2 (for delays)
+	HAL_TIM_Base_Start(&htim5);  // start timer_5 (for simulation time keeping)
 
-	instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
-	instruction.settings.micro_step = 3;
-	instruction.settings.spread_mode = 0;
+	HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)&state, (uint8_t*)&instruction_input, 32);
+
+	// start receiving ADC data
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&state.raw_angle, 1);
+
+	//instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
 
 	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
 
-	set_motor_setting(&instruction);  // TODO: place correctly
-
 	TIM5->CNT = 0;
-	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt)
+	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]
+	while (!state.queue_size) {}
 	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // enable stepper (this is never undone)
 	while (1) {
 		if (step_gain < MIN_STEPPER_GAIN) { continue; }  // make sure that the step delay is never greater than 0.75 s

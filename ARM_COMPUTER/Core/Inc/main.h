@@ -57,34 +57,44 @@ typedef enum {
 	RETURN_ERROR_FIXED = 0x08,  // fixed invalid instruction
 	RETURN_ERROR = 0x10
 } RETURN_FLAGS;
+
+/* State
+ * state of the MCU
+ */
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
+typedef struct {  // uint8_t[32]
+	double				vel;
+	double				acc;
+	struct {  // +- 188,744,040 deg
+		int32_t			rotation: 20;
+		uint32_t		angle: 12;
+	}					pos, target;
+	volatile uint16_t	raw_angle;
+	uint16_t			instrution_id;	// instruction id which is currently being executed
+	uint8_t				queue_size;		// amount of instructions that are queued
+	uint8_t				micro_step: 2;  // microstep setting
+	uint8_t				srd_mode: 1;	// srd mode on the motor controller
+	uint8_t				_: 5;			// reserved
+	uint8_t				__[2];
+} MCU_State;
+
 /* Instruction
  * motor instruction (includes flags)
  */
-// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff
-typedef struct {  // uint8_t[28]
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff, 0xffff, 0xffff
+typedef struct {  // uint8_t[32]
 	double		target;			// rad
 	double		max_vel;		// rad / s
 	double		max_acc;		// rad / s^2
 	uint16_t	micro_step: 2;  // microstep setting
 	uint16_t	srd_mode: 1;	// srd mode on the motor controller
 	uint16_t	action: 4;		// look in ACTION enum for possible actions
-	uint16_t	id: 9;			// selected motor
-	uint16_t	crc;			// TODO (not a priority)
+	uint16_t	dir: 2;			// 0 CLOSEST, 1 CW, 2 CCW, 3 LONGEST
+	uint16_t	id: 7;			// selected motor
+	uint16_t	instrution_id;	// instruction id
+	uint16_t	_;				// reserved uint8_t[2]
+	uint16_t	crc;
 } MCU_Instruction;
-
-/* State
- * state of the motor controller
- */
-// 0xffffffff 0xffffffff 0xffffffffffffffffffffffffffffffffffffffff
-typedef struct {
-	struct {  // +- 188,744,040 deg
-		uint32_t sign: 1;
-		uint32_t rotation: 19;
-		uint32_t angle: 12;
-	} pos, target;
-	// TODO: add all skewsin variables to state struct
-	uint8_t reserved[20];
-} MCU_State;
 
 /* Handshake
  * this struct is used to establish a handshake between pc and mcu

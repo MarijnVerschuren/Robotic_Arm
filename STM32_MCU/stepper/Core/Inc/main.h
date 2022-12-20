@@ -44,20 +44,44 @@ typedef enum {  // MS2, MS1
 	M16 =	0x00b0	// 0000 0000 11 00 0000		both pins high
 } MICRO_STEP;
 
-typedef struct {
-	int64_t pos;
-	int64_t job;
+/* State
+ * state of the MCU
+ */
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
+typedef struct {  // uint8_t[32]
+	double				vel;
+	double				acc;
+	struct {  // +- 188,744,040 deg
+		int32_t			rotation: 20;
+		uint32_t		angle: 12;
+	}					pos, target;
+	volatile uint16_t	raw_angle;
+	uint16_t			instrution_id;	// instruction id which is currently being executed
+	uint8_t				queue_size;		// amount of instructions that are queued
+	uint8_t				queue_index;	// current index wich is being excecuted
+	uint8_t				micro_step: 2;  // microstep setting
+	uint8_t				srd_mode: 1;	// srd mode on the motor controller
+	uint8_t				_: 5;			// reserved
+	uint8_t				__;
 } MCU_State;
 
-typedef struct {
-	int64_t steps;
-	uint32_t pulse_delay;  // delay from 1us -> 4295s (1 is added to delay because 0 us is not valid)
-	struct {
-		uint8_t micro_step : 2;  // 0 - 8 (0: MS2, 1: MS4, 2: MS8, 3: MS16)
-		uint8_t spread_mode : 1;  // spread mode flag
-		uint16_t _ : 13;  // reserved
-	} settings;
-	uint16_t crc;  // add crc16?
+
+/* Instruction
+ * motor instruction (includes flags)
+ */
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff, 0xffff, 0xffff
+typedef struct {  // uint8_t[32]
+	double		target;			// rad
+	double		max_vel;		// rad / s
+	double		max_acc;		// rad / s^2
+	uint16_t	micro_step: 2;  // microstep setting
+	uint16_t	srd_mode: 1;	// srd mode on the motor controller
+	uint16_t	action: 4;		// look in ACTION enum for possible actions
+	uint16_t	dir: 2;			// 0 CLOSEST, 1 CW, 2 CCW, 3 LONGEST
+	uint16_t	id: 7;			// selected motor
+	uint16_t	instrution_id;	// instruction id
+	uint16_t	_;				// reserved uint8_t[2]
+	uint16_t	crc;
 } MCU_Instruction;
 
 /* Instruction
@@ -96,12 +120,14 @@ typedef struct {
 #define DEG_TO_M2_STEP_CONV		1 / (MOTOR_STEP_DEG / 2)
 #define DEG_TO_M4_STEP_CONV		1 / (MOTOR_STEP_DEG / 4)
 #define DEG_TO_M8_STEP_CONV		1 / (MOTOR_STEP_DEG / 8)
-#define DEG_TO_M16_STEP_CONV	1 / (MOTOR_STEP_DEG / 16)
+#define DEG_TO_M16_STEP_CONV		1 / (MOTOR_STEP_DEG / 16)
 
 #define AS5600_TO_M2_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 2)
 #define AS5600_TO_M4_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 4)
 #define AS5600_TO_M8_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 8)
 #define AS5600_TO_M16_STEP_CONV	AS5600_DEG_CONV / (MOTOR_STEP_DEG / 16)
+
+#define MAX_QUEUE_SIZE 32
 
 /* the tau value is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
  * then multiplied by 10^9 to pre-compute a part of the calculation done with it (define in terms of us))  */
@@ -113,17 +139,15 @@ typedef struct {
 #define AS5600_I2C_ERROR_MARGIN 2  /*try changing to 1*/
 
 // structures
-extern MCU_State			state;
-extern MCU_Instruction		instruction;
-extern AS5600_TypeDef*		sensor;
-// variables used in the euler method
-extern volatile uint16_t	AS5600_analog;		// variable for angles received by ADC (automatic: DMA)
-extern uint16_t 			AS5600_prev;		// variable that stores the last measurement
-extern double				AS5600_pos_f64;
-extern uint16_t				AS5600_pos;
-extern int16_t				AS5600_delta_pos;
+extern MCU_State					state;					// structure that contains the current state of important variables
+extern volatile MCU_Instruction*	instruction; 			// pointer to current instruction in queue
+extern volatile MCU_Instruction		queue[MAX_QUEUE_SIZE];	// 1kb (max max size: 256 indexes)
+extern volatile MCU_Instruction		instruction_input;		// instruction directly received from SPI (this will be put into queue if there is space)
+extern AS5600_TypeDef*				sensor;
 
-extern double				step_gain;	// -1 (backward) || 1 (forward) || 0 (idle)
+extern volatile double				AS5600_pos_f64; 		// accumulator
+extern volatile double				step_gain;				// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
+extern uint8_t 						current_queue_index;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -147,6 +171,8 @@ void delay_us(uint32_t);
 void until_us(uint32_t);
 void set_motor_setting(MCU_Instruction*);
 void euler_method();  // typical execution time ~45 us
+void* get_next_empty_queue_ptr();  // increments queue_size
+void* get_next_queue_ptr();  // decrements queue_size and increments queue_index
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
