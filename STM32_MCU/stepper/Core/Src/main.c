@@ -70,12 +70,12 @@ void euler_method() {  // typical execution time ~45 us
 void* get_next_empty_queue_ptr() {
 	if (state.queue_size == MAX_QUEUE_SIZE) { return 0; }  // nullptr if full
 	void* ptr = &queue[(state.queue_index + state.queue_size) % MAX_QUEUE_SIZE];
-	state.queue_size++; return ptr;
+	return ptr;
 }
 void* get_next_queue_ptr() {
-	if (!state.queue_size) { return; }  // check if there is a new instruction in the queue
+	if (!state.queue_size) { return 0; }  // nullptr if queue is empty
 	state.queue_index = (state.queue_index + 1) % MAX_QUEUE_SIZE;
-	state.queue_size--;
+	state.queue_size--;  // flag last instruction as overwriteable
 	return &queue[state.queue_index];
 }
 
@@ -105,10 +105,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	if (target_delta < 10) {  // ~1 deg
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
 		step_gain = MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
-		// optimize this or change the function
+		// TODO: change the function
 	} else {
 		instruction = get_next_queue_ptr();  // decrements queue_size and increments queue_index
+		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, !instruction);  // disable stepper when no instruction is loaded
+		set_motor_setting(instruction);
 		step_gain = 0;
+		// TODO: build stepper function here for div above
 	}
 	return;
 }
@@ -118,7 +121,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	void* dst = get_next_empty_queue_ptr();  // increments queue_size
 	if (!dst) { return; }  // exit if queue is full
 	memcpy(dst, &instruction_input, sizeof(MCU_Instruction));
-	set_motor_setting(instruction);
+	state.queue_size++;
 }
 /* USER CODE END 0 */
 
@@ -204,8 +207,6 @@ int main(void)
 
 	TIM5->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]
-	while (!state.queue_size) {}
-	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // enable stepper (this is never undone)
 	while (1) {
 		if (step_gain < MIN_STEPPER_GAIN) { continue; }  // make sure that the step delay is never greater than 0.75 s
 		// dir is set in interrupt

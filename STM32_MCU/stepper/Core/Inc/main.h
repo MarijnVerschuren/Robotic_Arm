@@ -57,12 +57,13 @@ typedef struct {  // uint8_t[32]
 	}					pos, target;
 	volatile uint16_t	raw_angle;
 	uint16_t			instrution_id;	// instruction id which is currently being executed
+	uint16_t			micro_step: 2;  // microstep setting
+	uint16_t			srd_mode: 1;	// srd mode on the motor controller
+	uint16_t			id : 7;			// reserved until the main controller fills this in
+	uint16_t			_ : 6;			// reserved
 	uint8_t				queue_size;		// amount of instructions that are queued
 	uint8_t				queue_index;	// current index wich is being excecuted
-	uint8_t				micro_step: 2;  // microstep setting
-	uint8_t				srd_mode: 1;	// srd mode on the motor controller
-	uint8_t				_: 5;			// reserved
-	uint8_t				__;
+
 } MCU_State;
 
 
@@ -170,9 +171,9 @@ void adc_pre_euler(void);
 void delay_us(uint32_t);
 void until_us(uint32_t);
 void set_motor_setting(MCU_Instruction*);
-void euler_method();  // typical execution time ~45 us
-void* get_next_empty_queue_ptr();  // increments queue_size
-void* get_next_queue_ptr();  // decrements queue_size and increments queue_index
+void euler_method();			// typical execution time ~45 us
+void* get_next_empty_queue_ptr();
+void* get_next_queue_ptr();		// decrements queue_size and increments queue_index
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

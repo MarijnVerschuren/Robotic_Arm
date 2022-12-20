@@ -10,6 +10,8 @@
 
 
 extern const uint16_t crc16_dnp_table[256];
+extern uint16_t instrution_id_counter;
+
 
 /* Flags
  * part of instruction that tells mcu what to do with the provided data
@@ -36,20 +38,47 @@ enum RETURN_FLAGS : uint8_t {
 	ERROR = 0x10
 };
 
+/* State
+ * state of the MCU
+ */
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
+struct MCU_State {  // uint8_t[32]
+	double				vel;
+	double				acc;
+	struct {  // +- 188,744,040 deg
+		int32_t			rotation: 20;
+		uint32_t		angle: 12;
+	}					pos, target;
+	uint16_t			raw_angle;
+	uint16_t			instrution_id;	// instruction id which is currently being executed
+	uint16_t			micro_step: 2;  // microstep setting
+	uint16_t			srd_mode: 1;	// srd mode on the motor controller
+	uint16_t			id : 7;			// reserved until the main controller fills this in
+	uint16_t			_ : 6;			// reserved
+	uint8_t				queue_size;		// amount of instructions that are queued
+	uint8_t				queue_index;	// current index wich is being excecuted
+
+};
+
+
 /* Instruction
  * motor instruction (includes flags)
  */
-// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff
-struct MCU_Instruction {  // uint8_t[28]
+// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff, 0xffff, 0xffff
+struct MCU_Instruction {  // uint8_t[32]
 	double		target;			// rad
 	double		max_vel;		// rad / s
 	double		max_acc;		// rad / s^2
 	uint16_t	micro_step: 2;  // microstep setting
 	uint16_t	srd_mode: 1;	// srd mode on the motor controller
 	uint16_t	action: 4;		// look in ACTION enum for possible actions
-	uint16_t	id: 5;			// selected motor
-	uint16_t	crc;			// TODO (not a priority)
+	uint16_t	dir: 2;			// 0 CLOSEST, 1 CW, 2 CCW, 3 LONGEST
+	uint16_t	id: 7;			// selected motor
+	uint16_t	instrution_id;	// instruction id
+	uint16_t	_;				// reserved uint8_t[2]
+	uint16_t	crc;
 };
+
 
 /* Handshake
  * this struct is used to establish a handshake between pc and mcu
@@ -70,8 +99,11 @@ struct CTRL_Handshake {  // uint8_t[6]
 
 
 // formats variables into a instruction packet
-uint8_t* new_MCU_Instruction(uint16_t id, uint8_t action, double target, double max_vel, double max_acc, uint8_t micro_step, uint8_t srd_mode);
-void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* id, uint16_t* crc);
+uint8_t* new_MCU_State(double vel, double acc, int32_t pos_rotation, int32_t target_rotation, uint16_t pos_angle, uint16_t target_angle, uint16_t raw_angle, uint16_t instrution_id, uint8_t micro_step, uint8_t srd_mode, uint8_t id, uint8_t queue_size, uint8_t queue_index);
+void get_MCU_State_data(uint8_t* package, double* vel, double* acc, int32_t* pos_rotation, int32_t* target_rotation, uint16_t* pos_angle, uint16_t* target_angle, uint16_t* raw_angle, uint16_t* instrution_id, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* id, uint8_t* queue_size, uint8_t* queue_index);
+
+uint8_t* new_MCU_Instruction(uint16_t id, uint8_t action, double target, double max_vel, double max_acc, uint8_t micro_step, uint8_t srd_mode, uint8_t dir, uint16_t* instrution_id);
+void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* dir, uint8_t* id, uint16_t* instrution_id uint16_t* crc);
 
 // sets the settings of received handshake
 uint8_t* new_CTRL_Handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud);
