@@ -93,7 +93,7 @@ uint8_t* new_MCU_Instruction(uint16_t id, uint8_t action, double target, double 
 	return (uint8_t*)data;
 }
 
-void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* dir, uint8_t* id, uint16_t* instrution_id uint16_t* crc) {
+void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* dir, uint8_t* id, uint16_t* instrution_id, uint16_t* crc) {
 	MCU_Instruction* data =	(MCU_Instruction*)package;
 	*target =		data->target;
 	*max_vel =		data->max_vel;

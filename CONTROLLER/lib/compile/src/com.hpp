@@ -103,7 +103,7 @@ uint8_t* new_MCU_State(double vel, double acc, int32_t pos_rotation, int32_t tar
 void get_MCU_State_data(uint8_t* package, double* vel, double* acc, int32_t* pos_rotation, int32_t* target_rotation, uint16_t* pos_angle, uint16_t* target_angle, uint16_t* raw_angle, uint16_t* instrution_id, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* id, uint8_t* queue_size, uint8_t* queue_index);
 
 uint8_t* new_MCU_Instruction(uint16_t id, uint8_t action, double target, double max_vel, double max_acc, uint8_t micro_step, uint8_t srd_mode, uint8_t dir, uint16_t* instrution_id);
-void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* dir, uint8_t* id, uint16_t* instrution_id uint16_t* crc);
+void get_MCU_Instruction_data(uint8_t* package, double* target, double* max_vel, double* max_acc, uint8_t* micro_step, uint8_t* srd_mode, uint8_t* action, uint8_t* dir, uint8_t* id, uint16_t* instrution_id, uint16_t* crc);
 
 // sets the settings of received handshake
 uint8_t* new_CTRL_Handshake(uint8_t motor_count, uint8_t init_0, uint32_t baud);

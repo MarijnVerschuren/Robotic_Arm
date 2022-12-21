@@ -102,7 +102,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	// TODO: delete / re-do: pathfinding code
 	// TODO: tune interrupt timing
 
-	if (target_delta < 10) {  // ~1 deg
+	if (ABS(target_delta) > 10) {  // ~1 deg
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
 		step_gain = MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
 		// TODO: change the function

@@ -57,7 +57,7 @@ PYBIND11_MODULE(py_lib, handle) {
 		double max_acc,
 		uint8_t micro_step,
 		uint8_t srd_mode,
-		uint8_t dir,
+		uint8_t dir
 	) {
 		uint16_t instrution_id;
 		uint8_t* data = new_MCU_Instruction(id, action, target, max_vel, max_acc, micro_step, srd_mode, dir, &instrution_id);
@@ -76,7 +76,7 @@ PYBIND11_MODULE(py_lib, handle) {
 		uint8_t		id;
 		uint16_t	instrution_id;
 		uint16_t	crc;
-		get_MCU_Instruction_data((uint8_t*)instrution, &target, &max_vel, &max_acc, &micro_step, &srd_mode, &action &dir, &id, &instrution_id, &crc);
+		get_MCU_Instruction_data((uint8_t*)instrution, &target, &max_vel, &max_acc, &micro_step, &srd_mode, &action, &dir, &id, &instrution_id, &crc);
 		return std::make_tuple(target, max_vel, max_acc, micro_step, srd_mode, action, dir, id, instrution_id, crc);
 	});
 

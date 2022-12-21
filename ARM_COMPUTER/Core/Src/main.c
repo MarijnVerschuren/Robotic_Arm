@@ -144,10 +144,6 @@ int main(void)
 	instruction.instrution_id = 0;
 	instruction.crc = crc16_dnp(&instruction, 30);
 
-	HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
-	HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
-	HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
-
 
 	while (1) {
 		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
@@ -173,9 +169,11 @@ int main(void)
 
 		// TODO: test this
 		// TODO: make messages more flexible for other motor drivers
-		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
-		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
-		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+		for (uint8_t i = 0; i < 32; i++) {  // fill queue
+			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
+			HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
+			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+		}
 
 		if (instruction.action & POLL) {
 			return_code = SYNC_BYTE;
