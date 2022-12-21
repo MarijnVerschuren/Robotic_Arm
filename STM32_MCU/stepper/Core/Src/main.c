@@ -204,6 +204,7 @@ int main(void)
 	//instruction.pulse_delay = 74; // 74;  // safe operating range is from 75us and up
 
 	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
+	// TODO: FIX ADC NOW IT STARTS FROM 500 AND HANGS ON 4096
 
 	TIM5->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]

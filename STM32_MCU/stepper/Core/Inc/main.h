@@ -209,6 +209,8 @@ void* get_next_queue_ptr();		// decrements queue_size and increments queue_index
 #define AS5600_SCL_GPIO_Port GPIOB
 #define AS5600_SDA_Pin GPIO_PIN_7
 #define AS5600_SDA_GPIO_Port GPIOB
+#define __Pin GPIO_PIN_9
+#define __GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
