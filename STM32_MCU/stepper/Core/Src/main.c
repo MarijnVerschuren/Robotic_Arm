@@ -20,6 +20,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+// min and max measured values
+#define MIN_ADC_IN 480
+#define MAX_ADC_IN 4000
+#define ACD_RANGE_CONV 4096 / (MAX_ADC_IN - MIN_ADC_IN)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,10 +63,11 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->srd_mode);
 }
 void euler_method() {  // typical execution time ~45 us
-	register uint16_t pos_diff = (AS5600_pos_f64 - state.raw_angle);  // rotation detection
-	state.pos.rotation += pos_diff > 2048; state.pos.rotation += pos_diff < -2048;
+	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle - MIN_ADC_IN);
+	register uint16_t pos_diff = (AS5600_pos_f64 - raw);  // rotation detection
+	state.pos.rotation += pos_diff > 2048; state.pos.rotation -= pos_diff < -2048;
 	register double alpha = 1 / ((EULER_TAU / TIM5->CNT) + 1);
-	AS5600_pos_f64 = (state.raw_angle * alpha) + ((1 - alpha) * AS5600_pos_f64);
+	AS5600_pos_f64 = (raw * alpha) + ((1 - alpha) * AS5600_pos_f64);
 	state.vel = (1e6 / TIM5->CNT) * ((uint16_t)AS5600_pos_f64 - state.pos.angle) * AS5600_RAD_CONV;  // rad / s
 	state.pos.angle = (uint16_t)AS5600_pos_f64;
 	TIM5->CNT = 0;
@@ -104,24 +109,37 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 	if (ABS(target_delta) > 10) {  // ~1 deg
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
-		step_gain = MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024)));  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		step_gain = MIN(1, MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024))));  // all deltas greater than 1/8 rotation are met by a gain of 100%
 		// TODO: change the function
-	} else {
+	} else if (!state.lock) {
 		instruction = get_next_queue_ptr();  // decrements queue_size and increments queue_index
-		HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, !instruction);  // disable stepper when no instruction is loaded
+		// HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, !instruction);  // disable stepper when no instruction is loaded
 		set_motor_setting(instruction);
 		step_gain = 0;
-		// TODO: build stepper function here for div above
+		state.lock = 1;
+		// TODO: build variables for stepper function here to call in div above
 	}
 	return;
 }
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	// only hspi1 is used so there is no need to check
-	void* dst = get_next_empty_queue_ptr();  // increments queue_size
+	void* dst = get_next_empty_queue_ptr();
 	if (!dst) { return; }  // exit if queue is full
+	// the main computer is told how its data is recieved via the Status pin
+	// note that the pin is cleared when something is received correctly
+	// this means that the main computer has to check this pin before sending the next instruction to prevent data loss
+	if (instruction_input.crc != crc16_dnp(&instruction_input, 30)) {
+		HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1); return;
+	}
+	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 0);
 	memcpy(dst, &instruction_input, sizeof(MCU_Instruction));
 	state.queue_size++;
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	// this will not instantly load next instruction
+	if (GPIO_Pin == INSTUCTION_INT_Pin) { state.lock = 0; }
 }
 /* USER CODE END 0 */
 
@@ -176,6 +194,7 @@ int main(void)
 	state.queue_index = 0;
 	state.micro_step = 0;
 	state.srd_mode = 0;
+	state.lock = 0;  // TODO: reset this from within the GO_INTERRUPT
 	// initialize the state struct using AS5600 position values
 	AS5600_get_angle(sensor, &state.raw_angle);
 	state.pos.angle =	state.raw_angle;
@@ -205,7 +224,7 @@ int main(void)
 
 	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
 	// TODO: FIX ADC NOW IT STARTS FROM 500 AND HANGS ON 4096
-
+	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);
 	TIM5->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]
 	while (1) {

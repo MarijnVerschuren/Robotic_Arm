@@ -32,6 +32,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "as5600.h"
+#include "crc.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -60,7 +61,8 @@ typedef struct {  // uint8_t[32]
 	uint16_t			micro_step: 2;  // microstep setting
 	uint16_t			srd_mode: 1;	// srd mode on the motor controller
 	uint16_t			id : 7;			// reserved until the main controller fills this in
-	uint16_t			_ : 6;			// reserved
+	uint16_t			lock: 1;		// this prevents the MCU from loading the next instruction
+	uint16_t			_ : 5;			// reserved
 	uint8_t				queue_size;		// amount of instructions that are queued
 	uint8_t				queue_index;	// current index wich is being excecuted
 
@@ -183,6 +185,7 @@ void* get_next_queue_ptr();		// decrements queue_size and increments queue_index
 #define STATUS_PIN_GPIO_Port GPIOA
 #define INSTUCTION_INT_Pin GPIO_PIN_3
 #define INSTUCTION_INT_GPIO_Port GPIOA
+#define INSTUCTION_INT_EXTI_IRQn EXTI3_IRQn
 #define NSS_Pin GPIO_PIN_4
 #define NSS_GPIO_Port GPIOA
 #define SCK_Pin GPIO_PIN_5
