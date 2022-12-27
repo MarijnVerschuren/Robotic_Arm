@@ -133,12 +133,32 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define C_INT_Pin GPIO_PIN_12
+#define C_INT_GPIO_Port GPIOB
 #define CS_0_Pin GPIO_PIN_13
 #define CS_0_GPIO_Port GPIOB
-#define CS_1_Pin GPIO_PIN_14
+#define CF_0_Pin GPIO_PIN_14
+#define CF_0_GPIO_Port GPIOB
+#define CS_1_Pin GPIO_PIN_15
 #define CS_1_GPIO_Port GPIOB
-#define CS_2_Pin GPIO_PIN_15
-#define CS_2_GPIO_Port GPIOB
+#define CF_1_Pin GPIO_PIN_6
+#define CF_1_GPIO_Port GPIOC
+#define CS_2_Pin GPIO_PIN_7
+#define CS_2_GPIO_Port GPIOC
+#define CF_2_Pin GPIO_PIN_8
+#define CF_2_GPIO_Port GPIOC
+#define CS_3_Pin GPIO_PIN_9
+#define CS_3_GPIO_Port GPIOC
+#define CF_3_Pin GPIO_PIN_8
+#define CF_3_GPIO_Port GPIOA
+#define CS_4_Pin GPIO_PIN_9
+#define CS_4_GPIO_Port GPIOA
+#define CF_4_Pin GPIO_PIN_10
+#define CF_4_GPIO_Port GPIOA
+#define CS_5_Pin GPIO_PIN_11
+#define CS_5_GPIO_Port GPIOA
+#define CF_5_Pin GPIO_PIN_12
+#define CF_5_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 #define SYNC_BYTE 0x5C
 /* USER CODE END Private defines */

@@ -109,10 +109,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 	if (ABS(target_delta) > 10) {  // ~1 deg
 		HAL_GPIO_WritePin(STEPPER_DIR_GPIO_Port, STEPPER_DIR_Pin, target_delta < 0);
-		step_gain = MIN(1, MIN(ABS(target_delta / 1024), MIN(ABS((target_delta + 1024) / 1024), ABS((target_delta - 1024) / 1024))));  // all deltas greater than 1/8 rotation are met by a gain of 100%
+		step_gain = MIN(1, ABS(target_delta / 1024));  // all deltas greater than 1/8 rotation are met by a gain of 100%
 		// TODO: change the function
 	} else if (!state.lock) {
 		instruction = get_next_queue_ptr();  // decrements queue_size and increments queue_index
+		if (!instruction) { return; }
 		// HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, !instruction);  // disable stepper when no instruction is loaded
 		set_motor_setting(instruction);
 		step_gain = 0;
@@ -129,8 +130,8 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	// the main computer is told how its data is recieved via the Status pin
 	// note that the pin is cleared when something is received correctly
 	// this means that the main computer has to check this pin before sending the next instruction to prevent data loss
-	if (instruction_input.crc != crc16_dnp(&instruction_input, 30)) {
-		HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1); return;
+	if (instruction_input.crc == crc16_dnp(&instruction_input, 30)) {
+		HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 0);
 	}
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 0);
 	memcpy(dst, &instruction_input, sizeof(MCU_Instruction));
@@ -139,6 +140,7 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	// this will not instantly load next instruction
+	if (GPIO_Pin == NSS_Pin) { HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1); }  // set the flag pin until reset from SPI_TxRxCplt callback on success
 	if (GPIO_Pin == INSTUCTION_INT_Pin) { state.lock = 0; }
 }
 /* USER CODE END 0 */
@@ -155,6 +157,7 @@ int main(void)
 	sensor->dir_port = AS5600_DIR_GPIO_Port;
 	sensor->dir_pin = AS5600_DIR_Pin;
 	sensor->positive_rotation_direction = AS5600_DIR_CW;
+	// TODO: test if hysteresis helps with rotation detection stability
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -191,7 +194,7 @@ int main(void)
 	state.acc = 0.0;
 	state.instrution_id = 0;
 	state.queue_size = 0;
-	state.queue_index = 0;
+	state.queue_index = 31;
 	state.micro_step = 0;
 	state.srd_mode = 0;
 	state.lock = 0;  // TODO: reset this from within the GO_INTERRUPT

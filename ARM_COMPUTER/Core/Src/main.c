@@ -169,12 +169,17 @@ int main(void)
 
 		// TODO: test this
 		// TODO: make messages more flexible for other motor drivers
-		for (uint8_t i = 0; i < 32; i++) {  // fill queue
+		do {
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
 			HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+			HAL_Delay(10);  // give mcu time to react
+		} while (HAL_GPIO_ReadPin(TEST_CF_GPIO_Port, TEST_CF_Pin));
+		if (instruction.action & OVERRIDE) {
+			HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 0);
+			HAL_Delay(5);  // give mcu time to react
+			HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 1);
 		}
-
 		if (instruction.action & POLL) {
 			return_code = SYNC_BYTE;
 			HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
