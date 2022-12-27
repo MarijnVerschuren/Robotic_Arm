@@ -53,8 +53,8 @@ HAL_StatusTypeDef AS5600_set_max_angle(AS5600_TypeDef* const handle, const uint1
 }
 HAL_StatusTypeDef AS5600_set_positive_rotation_direction(AS5600_TypeDef* const handle, const uint8_t direction) {
 	switch (direction) {
-	case AS5600_DIR_CW:		HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_RESET);
-	case AS5600_DIR_CCW:	HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_SET);
+	case AS5600_DIR_CW:		HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_RESET); break;
+	case AS5600_DIR_CCW:	HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_SET); break;
 	default:				return HAL_ERROR;	// invalid direction
 	}
 	return HAL_OK;
