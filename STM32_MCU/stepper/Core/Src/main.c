@@ -157,7 +157,7 @@ int main(void)
 	sensor->dir_port = AS5600_DIR_GPIO_Port;
 	sensor->dir_pin = AS5600_DIR_Pin;
 	sensor->positive_rotation_direction = AS5600_DIR_CW;
-	// TODO: test if hysteresis helps with rotation detection stability
+	sensor->hysteresis = AS5600_HYSTERESIS_3LSB;  // go 8 segments over 0 and 4096 before flip
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
