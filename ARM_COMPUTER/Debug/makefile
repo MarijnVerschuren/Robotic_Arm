@@ -1,6 +1,6 @@
 ################################################################################
 # Automatically-generated file. Do not edit!
-# Toolchain: local
+# Toolchain: GNU Tools for STM32 (10.3-2021.10)
 ################################################################################
 
 -include ../makefile.init
@@ -60,8 +60,8 @@ all: main-build
 main-build: main_controller.elf secondary-outputs
 
 # Tool invocations
-main_controller.elf main_controller.map: $(OBJS) $(USER_OBJS) /mnt/nvme/home/marijn/Github/Robotic_Arm/ARM_COMPUTER/STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "main_controller.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/mnt/nvme/home/marijn/Github/Robotic_Arm/ARM_COMPUTER/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="main_controller.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+main_controller.elf main_controller.map: $(OBJS) $(USER_OBJS) /home/marijn/Github/Robotic_Arm/ARM_COMPUTER/STM32F411RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "main_controller.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/marijn/Github/Robotic_Arm/ARM_COMPUTER/STM32F411RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="main_controller.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

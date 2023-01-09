@@ -174,7 +174,7 @@ int main(void)
 			HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
 			HAL_Delay(10);  // give mcu time to react
-		} while (HAL_GPIO_ReadPin(TEST_CF_GPIO_Port, TEST_CF_Pin));
+		} while (HAL_GPIO_ReadPin(CF_0_GPIO_Port, CF_0_Pin));
 		if (instruction.action & OVERRIDE) {
 			HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 0);
 			HAL_Delay(5);  // give mcu time to react
