@@ -1,7 +1,7 @@
 Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
- ../Core/Inc/stm32f4xx_hal_conf.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
@@ -34,7 +34,7 @@ Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.o: \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
-../Core/Inc/stm32f4xx_hal_conf.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:

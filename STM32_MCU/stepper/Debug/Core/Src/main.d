@@ -1,6 +1,7 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
+Core/Src/main.o: ../Core/Src/main.c \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
- ../Core/Inc/stm32f4xx_hal_conf.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
@@ -32,12 +33,18 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- ../Core/Inc/as5600.h ../Core/Inc/crc.h ../Core/Inc/main.h \
- ../Core/Inc/adc.h ../Core/Inc/dma.h ../Core/Inc/i2c.h ../Core/Inc/spi.h \
- ../Core/Inc/tim.h ../Core/Inc/gpio.h
-../Core/Inc/main.h:
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/adc.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/dma.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/i2c.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/spi.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/tim.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/gpio.h
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
-../Core/Inc/stm32f4xx_hal_conf.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
@@ -69,12 +76,12 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
-../Core/Inc/as5600.h:
-../Core/Inc/crc.h:
-../Core/Inc/main.h:
-../Core/Inc/adc.h:
-../Core/Inc/dma.h:
-../Core/Inc/i2c.h:
-../Core/Inc/spi.h:
-../Core/Inc/tim.h:
-../Core/Inc/gpio.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/adc.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/dma.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/i2c.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/spi.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/tim.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/gpio.h:

@@ -131,9 +131,9 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	// note that the pin is cleared when something is received correctly
 	// this means that the main computer has to check this pin before sending the next instruction to prevent data loss
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, \
-		(instruction_input.crc != crc16_dnp(&instruction_input, 30)) \
+		(instruction_input.crc != crc16_dnp((uint8_t*)&instruction_input, 30))
 	);
-	memcpy(dst, &instruction_input, sizeof(MCU_Instruction));
+	memcpy(dst, (void*)&instruction_input, sizeof(MCU_Instruction));
 	state.queue_size++;
 }
 

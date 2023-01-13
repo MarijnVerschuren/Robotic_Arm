@@ -1,6 +1,8 @@
-Core/Src/gpio.o: ../Core/Src/gpio.c ../Core/Inc/gpio.h ../Core/Inc/main.h \
+Core/Src/gpio.o: ../Core/Src/gpio.c \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/gpio.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h \
- ../Core/Inc/stm32f4xx_hal_conf.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h \
@@ -32,11 +34,12 @@ Core/Src/gpio.o: ../Core/Src/gpio.c ../Core/Inc/gpio.h ../Core/Inc/main.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
- ../Core/Inc/as5600.h ../Core/Inc/crc.h
-../Core/Inc/gpio.h:
-../Core/Inc/main.h:
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/gpio.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
-../Core/Inc/stm32f4xx_hal_conf.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_hal_conf.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h:
 ../Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h:
@@ -68,5 +71,5 @@ Core/Src/gpio.o: ../Core/Src/gpio.c ../Core/Inc/gpio.h ../Core/Inc/main.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
-../Core/Inc/as5600.h:
-../Core/Inc/crc.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h:
