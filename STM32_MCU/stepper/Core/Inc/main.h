@@ -33,6 +33,7 @@ extern "C" {
 /* USER CODE BEGIN Includes */
 #include "as5600.h"
 #include "crc.h"
+#include "list.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -45,14 +46,26 @@ typedef enum {  // MS2, MS1
 	M16 =	0x00b0	// 0000 0000 11 00 0000		both pins high
 } MICRO_STEP;
 
+typedef enum {
+	// OK codes
+	OK = 0x0,
+	INSTRUCTION_FINISHED = 0x1,
+	// soft errors
+	INSTRUCTION_UNATTAINABLE = 0x2,
+	// hard errors
+	CRC_ERROR = 0x10,
+	QUEUE_FULL = 0x20,
+	SENSOR_ERROR = 0x30,
+} STATUS_CODES;
+
 /* State
  * state of the MCU
  */
 // 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
 typedef struct {  // uint8_t[32]
-	double				vel;
-	double				acc;
-	struct {  // +- 188,744,040 deg
+	volatile double		vel;
+	volatile double		acc;
+	volatile struct {  // +- 188,744,040 deg
 		int32_t			rotation: 20;
 		uint32_t		angle: 12;
 	}					pos, target;
@@ -61,11 +74,9 @@ typedef struct {  // uint8_t[32]
 	uint16_t			micro_step: 2;  // microstep setting
 	uint16_t			srd_mode: 1;	// srd mode on the motor controller
 	uint16_t			id : 7;			// reserved until the main controller fills this in
-	uint16_t			lock: 1;		// this prevents the MCU from loading the next instruction
-	uint16_t			_ : 5;			// reserved
-	uint8_t				queue_size;		// amount of instructions that are queued
-	uint8_t				queue_index;	// current index wich is being excecuted
-
+	uint16_t			_: 6;			// reserved
+	volatile uint16_t	status: 8;		// status codes
+	volatile uint16_t	queue_size: 8;
 } MCU_State;
 
 
@@ -86,35 +97,6 @@ typedef struct {  // uint8_t[32]
 	uint16_t	_;				// reserved uint8_t[2]
 	uint16_t	crc;
 } MCU_Instruction;
-
-/* Instruction
- * motor instruction (includes flags)
- *//*
-// 0xffffffffffffffff 0xffffffffffffffff 0xffffffffffffffff ((0x3, 0x4, 0x78, 0xff80) => 0xffff) 0xffff
-typedef struct {  // uint8_t[28]
-	double		target;			// rad
-	double		max_vel;		// rad / s
-	double		max_acc;		// rad / s^2
-	uint16_t	micro_step: 2;  // microstep setting
-	uint16_t	srd_mode: 1;	// srd mode on the motor controller
-	uint16_t	action: 4;		// look in ACTION enum for possible actions
-	uint16_t	id: 9;			// selected motor
-	uint16_t	crc;			// TODO (not a priority)
-} MCU_Instruction; */
-
-/* State
- * state of the motor controller
- *//*
-// 0xffffffff 0xffffffff 0xffffffffffffffffffffffffffffffffffffffff
-typedef struct {
-	struct {  // +- 188,744,040 deg
-		uint32_t sign: 1;
-		uint32_t rotation: 19;
-		uint32_t angle: 12;
-	} pos, target;
-	// TODO: add all skewsin variables to state struct
-	uint8_t reserved[20];
-} MCU_State; */
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
@@ -135,7 +117,7 @@ typedef struct {
 /* the tau value is a pre-computed value and describes a system where frequencies of +70KHz are filtered out
  * then multiplied by 10^9 to pre-compute a part of the calculation done with it (define in terms of us))  */
 #define EULER_TAU 2.3
-#define MIN_STEPPER_GAIN 1e-4
+#define MIN_STEPPER_GAIN 1e-5
 #define MIN_STEPPER_DELAY 75
 // this error margins are applied to the received angle values (in units 360/4096 deg)
 #define AS5600_ADC_ERROR_MARGIN 10
@@ -150,7 +132,8 @@ extern AS5600_TypeDef*				sensor;
 
 extern volatile double				AS5600_pos_f64; 		// accumulator
 extern volatile double				step_gain;				// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
-extern uint8_t 						current_queue_index;
+extern volatile uint8_t 			queue_index;
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
