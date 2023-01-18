@@ -73,7 +73,7 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->srd_mode);
 }
 void euler_method(void) {  // typical execution time ~45 us
-	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle - MIN_ADC_IN);
+	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle);
 	register uint16_t pos_diff = (AS5600_pos_f64 - raw);  // rotation detection
 	state.pos.rotation += pos_diff > 2048; state.pos.rotation -= pos_diff < -2048;
 	register double alpha = 1 / ((EULER_TAU / TIM5->CNT) + 1);
@@ -83,13 +83,11 @@ void euler_method(void) {  // typical execution time ~45 us
 	TIM5->CNT = 0;
 }  // TODO: integrate vel and acc <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	if (htim != &htim10) { return; }
 	//if (state.queue_size == 0) { return; }
 	euler_method();  // update state.pos.angle, AS5600_delta_pos using the selected mode
-	double target_delta = instruction.target - state.pos.angle;
-	target_delta = ABS(target_delta) < ABS(target_delta - 4096) ? target_delta : target_delta - 4096;
+	double target_delta = instruction.target - (double)state.pos.angle;
 
 	// TODO: buffer older measurements
 	// TODO: create optimal path or remove the 0 to 4096 jump in error when rotating
@@ -189,6 +187,9 @@ int main(void)
 	// disable motor driver
 	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
 
+	// enable messages
+	HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)&state, (uint8_t*)&instruction_input, 32);
+
 	// initialize AS5600 sensor
 	set_status(SENSOR_ERROR);
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1);  // set flag and set error code after first fault
@@ -222,8 +223,6 @@ int main(void)
 	HAL_TIM_Base_Start(&htim2);  // start timer_2 (for delays)
 	HAL_TIM_Base_Start(&htim5);  // start timer_5 (for simulation time keeping)
 
-	HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)&state, (uint8_t*)&instruction_input, 32);
-
 	// start receiving ADC data
 	HAL_ADC_Start_DMA(&hadc1, (uint32_t*)&state.raw_angle, 1);
 
@@ -231,7 +230,7 @@ int main(void)
 
 	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
 	// TODO: FIX ADC NOW IT STARTS FROM 500 AND HANGS ON 4096
-	// HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // TODO: remove this in final version
+	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // TODO: remove this in final version
 	TIM5->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]
 	while (1) {
