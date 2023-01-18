@@ -53,9 +53,8 @@ typedef enum {
 	// soft errors
 	INSTRUCTION_UNATTAINABLE = 0x2,
 	// hard errors
-	CRC_ERROR = 0x10,
-	QUEUE_FULL = 0x20,
-	SENSOR_ERROR = 0x30,
+	CRC_ERROR = 0x4,
+	SENSOR_ERROR = 0x8,
 } STATUS_CODES;
 
 /* State
@@ -70,13 +69,15 @@ typedef struct {  // uint8_t[32]
 		uint32_t		angle: 12;
 	}					pos, target;
 	volatile uint16_t	raw_angle;
-	uint16_t			instrution_id;	// instruction id which is currently being executed
-	uint16_t			micro_step: 2;  // microstep setting
-	uint16_t			srd_mode: 1;	// srd mode on the motor controller
-	uint16_t			id : 7;			// reserved until the main controller fills this in
-	uint16_t			_: 6;			// reserved
-	volatile uint16_t	status: 8;		// status codes
-	volatile uint16_t	queue_size: 8;
+	uint16_t			instrution_id;		// instruction id which is currently being executed
+	uint16_t			micro_step: 2;  	// microstep setting
+	uint16_t			srd_mode: 1;		// srd mode on the motor controller
+	volatile uint16_t	queue_size: 13;		// allows up to 8192 instructions in queue
+	// lots of parity for status
+	volatile uint16_t	status: 4;			// status codes
+	volatile uint16_t	n_status: 4;		// ~status
+	volatile uint16_t	status_parity: 1;	// parity for status
+	uint16_t			id : 7;				// reserved until the main controller fills this in
 } MCU_State;
 
 
@@ -125,14 +126,13 @@ typedef struct {  // uint8_t[32]
 
 // structures
 extern MCU_State					state;					// structure that contains the current state of important variables
-extern volatile MCU_Instruction*	instruction; 			// pointer to current instruction in queue
-extern volatile MCU_Instruction		queue[MAX_QUEUE_SIZE];	// 1kb (max max size: 256 indexes)
+extern volatile MCU_Instruction		instruction; 			// pointer to current instruction in queue
+extern volatile Linked_List*		queue;
 extern volatile MCU_Instruction		instruction_input;		// instruction directly received from SPI (this will be put into queue if there is space)
 extern AS5600_TypeDef*				sensor;
 
 extern volatile double				AS5600_pos_f64; 		// accumulator
 extern volatile double				step_gain;				// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
-extern volatile uint8_t 			queue_index;
 
 /* USER CODE END EC */
 
@@ -150,15 +150,14 @@ extern volatile uint8_t 			queue_index;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void i2c_pre_euler(void);
-void adc_pre_euler(void);
+void status_parity(void);
+void set_status(uint8_t);
+void reset_status(uint8_t);
 
 void delay_us(uint32_t);
 void until_us(uint32_t);
 void set_motor_setting(MCU_Instruction*);
-void euler_method();			// typical execution time ~45 us
-void* get_next_empty_queue_ptr();
-void* get_next_queue_ptr();		// decrements queue_size and increments queue_index
+void euler_method(void);			// typical execution time ~45 us
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

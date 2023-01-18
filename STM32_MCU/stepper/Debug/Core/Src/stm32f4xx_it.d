@@ -36,6 +36,7 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/list.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_it.h
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -74,4 +75,5 @@ Core/Src/stm32f4xx_it.o: ../Core/Src/stm32f4xx_it.c \
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/list.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/stm32f4xx_it.h:

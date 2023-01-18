@@ -120,7 +120,7 @@ void MX_TIM10_Init(void)
 
   /* USER CODE END TIM10_Init 1 */
   htim10.Instance = TIM10;
-  htim10.Init.Prescaler = 95;
+  htim10.Init.Prescaler = 9500;
   htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim10.Init.Period = 100;
   htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

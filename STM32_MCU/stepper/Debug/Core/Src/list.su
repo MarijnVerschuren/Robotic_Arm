@@ -1,0 +1,10 @@
+../Core/Src/list.c:11:6:delete_chain	16	static
+../Core/Src/list.c:16:6:init	16	static
+../Core/Src/list.c:26:14:new_list	8	static
+../Core/Src/list.c:27:6:delete_list	16	static
+../Core/Src/list.c:29:6:add	24	static
+../Core/Src/list.c:37:6:push	24	static
+../Core/Src/list.c:45:6:insert	32	static
+../Core/Src/list.c:54:6:pop	16	static
+../Core/Src/list.c:61:6:delete	24	static
+../Core/Src/list.c:70:15:get	24	static

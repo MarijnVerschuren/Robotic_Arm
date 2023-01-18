@@ -36,6 +36,7 @@ Core/Src/main.o: ../Core/Src/main.c \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h \
+ /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/list.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/adc.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/dma.h \
  /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/i2c.h \
@@ -79,6 +80,7 @@ Core/Src/main.o: ../Core/Src/main.c \
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/as5600.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/crc.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/main.h:
+/home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/list.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/adc.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/dma.h:
 /home/marijn/Github/Robotic_Arm/STM32_MCU/stepper/Core/Inc/i2c.h:

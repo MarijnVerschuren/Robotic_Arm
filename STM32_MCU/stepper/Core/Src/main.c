@@ -34,14 +34,13 @@
 
 /* USER CODE BEGIN PV */
 MCU_State					state;					// structure that contains the current state of important variables
-volatile MCU_Instruction*	instruction = queue;	// pointer to current instruction in queue
-volatile MCU_Instruction	queue[MAX_QUEUE_SIZE];	// 1kb (max 256 indexes)
+volatile MCU_Instruction	instruction;			// current instruction TODO: change -> to . and copy instruction into this variable <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+volatile Linked_List*		queue;
 volatile MCU_Instruction	instruction_input;		// instruction directly received from SPI (this will be put into queue if there is space)
 AS5600_TypeDef*				sensor;
 
 volatile double				AS5600_pos_f64;			// accumulator
 volatile double				step_gain;				// - (backward) || + (forward) || 0 (idle) [uniform distribution between -1 and 1]
-volatile uint8_t 			queue_index;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -51,6 +50,16 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void status_parity(void) {
+	state.n_status = ~state.status;
+	state.status_parity = state.status & 1;
+	state.status_parity ^= (state.status >> 1) & 1;
+	state.status_parity ^= (state.status >> 2) & 1;
+	state.status_parity ^= (state.status >> 3) & 1;
+}
+void set_status(uint8_t stat)	{ state.status |= stat;	status_parity(); }
+void reset_status(uint8_t stat)	{ state.status &= ~stat;status_parity(); }
+
 void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
 void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
 void set_motor_setting(MCU_Instruction* instruction) {
@@ -63,7 +72,7 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	}
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->srd_mode);
 }
-void euler_method() {  // typical execution time ~45 us
+void euler_method(void) {  // typical execution time ~45 us
 	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle - MIN_ADC_IN);
 	register uint16_t pos_diff = (AS5600_pos_f64 - raw);  // rotation detection
 	state.pos.rotation += pos_diff > 2048; state.pos.rotation -= pos_diff < -2048;
@@ -74,26 +83,12 @@ void euler_method() {  // typical execution time ~45 us
 	TIM5->CNT = 0;
 }  // TODO: integrate vel and acc <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
-// TODO: linked lists <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-void* get_next_empty_queue_ptr() {
-	if (state.queue_size == MAX_QUEUE_SIZE) { return 0; }  // nullptr if full
-	void* ptr = &queue[(queue_index + state.queue_size) % MAX_QUEUE_SIZE];
-	state.queue_size++;
-	return ptr;
-}
-void* get_next_queue_ptr() {
-	if (!state.queue_size) { return 0; }  // nullptr if queue is empty
-	queue_index = (queue_index + 1) % MAX_QUEUE_SIZE;
-	state.queue_size--;  // flag last instruction as overwriteable
-	return &queue[queue_index];
-}
-
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 	if (htim != &htim10) { return; }
 	//if (state.queue_size == 0) { return; }
 	euler_method();  // update state.pos.angle, AS5600_delta_pos using the selected mode
-	double target_delta = instruction->target - state.pos.angle;
+	double target_delta = instruction.target - state.pos.angle;
 	target_delta = ABS(target_delta) < ABS(target_delta - 4096) ? target_delta : target_delta - 4096;
 
 	// TODO: buffer older measurements
@@ -116,23 +111,22 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	// only hspi1 is used so there is no need to check
-	if ((instruction_input.crc != crc16_dnp((uint8_t*)&instruction_input, 30))) { state.status |= CRC_ERROR; return; }  // reject instruction if crc does not match
-	void* dst = get_next_empty_queue_ptr();
-	// TODO: check for empty (get commands) and for clear status()
-	// TODO: check for ROM get instruction <<<<<<<<<<<<
-	if (!dst) { state.status |= QUEUE_FULL; return; }  // exit if queue is full
+	if ((instruction_input.crc != crc16_dnp((uint8_t*)&instruction_input, 30))) { set_status(CRC_ERROR); return; }  // reject instruction if crc does not match
+	MCU_Instruction* new = malloc(sizeof(MCU_Instruction));
+	memcpy(new, &instruction_input, sizeof(MCU_Instruction));
+	push(queue, new);  // push to top of queue
+	state.queue_size = queue->size;
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 0);  // signal to the arm computer that instruction is received correctly
-	memcpy(dst, (void*)&instruction_input, sizeof(MCU_Instruction));
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	// this will not instantly load next instruction
 	if (GPIO_Pin == NSS_Pin) { HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1); }  // set the flag pin until reset from SPI_TxRxCplt callback on success
 	if (GPIO_Pin == INSTUCTION_INT_Pin) {
-		instruction = get_next_queue_ptr();  // decrements queue_size and increments queue_index
-		if (!instruction) { return; }
-		// HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, !instruction);  // disable stepper when no instruction is loaded
-		set_motor_setting(instruction);
+		pop(queue);
+		if (!queue->end) { return; }  // do not update instruction so that the position is held
+		memcpy(&instruction, queue->end->data, sizeof(MCU_Instruction));
+		set_motor_setting(&instruction);
 		step_gain = 0;
 	}
 }
@@ -145,6 +139,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	status_parity();
+	queue = new_list();
+
+	// <TEST>  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	instruction.target = 1000;
+	instruction.max_vel = 0;
+	instruction.max_acc = 0;
+	instruction.micro_step = 3;
+	instruction.srd_mode = 1;
+	instruction.action = 0xf;
+	instruction.dir = 0;
+	instruction.id = 0;
+	instruction.instrution_id = 0;
+	// </TEST>
+
 	sensor = AS5600_new();
 	sensor->i2c_handle = &hi2c1;
 	sensor->dir_port = AS5600_DIR_GPIO_Port;
@@ -181,16 +190,16 @@ int main(void)
 	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
 
 	// initialize AS5600 sensor
+	set_status(SENSOR_ERROR);
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1);  // set flag and set error code after first fault
-	while (AS5600_init(sensor) != HAL_OK) { state.status |= SENSOR_ERROR; }  // the sensor has to be on for the code to work
+	while (AS5600_init(sensor) != HAL_OK) {}  // the sensor has to be on for the code to work
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 0);  // reset flag
-	state.status &= ~SENSOR_ERROR;  // reset error status (so that this isn't read later on)
+	reset_status(SENSOR_ERROR);  // reset error status (so that this isn't read later on)
 
 	state.vel = 0.0;
 	state.acc = 0.0;
 	state.instrution_id = 0;
 	state.queue_size = 0;
-	queue_index = 31;
 	state.micro_step = 0;
 	state.srd_mode = 0;
 	// initialize the state struct using AS5600 position values
@@ -222,7 +231,7 @@ int main(void)
 
 	// TODO: Add function to the INSTRUCT_GO interrupt pin that will start the stepping function
 	// TODO: FIX ADC NOW IT STARTS FROM 500 AND HANGS ON 4096
-	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);
+	// HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 0);  // TODO: remove this in final version
 	TIM5->CNT = 0;
 	HAL_TIM_Base_Start_IT(&htim10);  // start timer_10  (sensor interupt) [100Hz]
 	while (1) {

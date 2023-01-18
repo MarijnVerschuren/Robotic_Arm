@@ -11,7 +11,6 @@
 #include "main.h"
 
 
-
 extern const uint16_t crc16_dnp_table[256];
 
 // crc16_dnp was the most error resilient for messages under 130 bytes with a hamming distance of 7!!
