@@ -12,6 +12,8 @@
 #include "usart.h"
 
 
+typedef uint8_t (*validator_fn_TypeDef) (void*);
+
 
 typedef struct {
 	uint8_t* buffer;
@@ -19,14 +21,15 @@ typedef struct {
 	__IO uint32_t* end;  // where the uart peripheral is writing
 	uint32_t size;
 	uint32_t read;
-} uart_ibuf;
+} uart_in_buffer_TypeDef;
 
 
-uart_ibuf* new_uart_ibuf(UART_HandleTypeDef* uart_handle, uint32_t size);
-void uart_ibuf_reset(uart_ibuf* handle);
+uart_in_buffer_TypeDef* new_uart_ibuf(UART_HandleTypeDef* uart_handle, uint32_t size);
+void uart_ibuf_reset(uart_in_buffer_TypeDef* handle);
 
-uint8_t uart_ibuf_increment(uart_ibuf* handle);
-uint8_t uart_ibuf_align(uart_ibuf* handle, uint8_t byte);
-uint8_t uart_ibuf_read(uart_ibuf* handle, void* output, uint32_t size);
+
+// get struct from buffer
+void uart_ibuf_get_struct(void* data, uint32_t size, validator_fn_TypeDef validator_fn);
+
 
 #endif /* INC_UART_BUFFER_H_ */

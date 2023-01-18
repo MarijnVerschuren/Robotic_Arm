@@ -20,10 +20,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-// min and max measured values
-#define MIN_ADC_IN 480
-#define MAX_ADC_IN 4000
-#define ACD_RANGE_CONV 4096 / (MAX_ADC_IN - MIN_ADC_IN)
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,11 +69,10 @@ void set_motor_setting(MCU_Instruction* instruction) {
 	HAL_GPIO_WritePin(STEPPER_SRD_GPIO_Port, STEPPER_SRD_Pin, instruction->srd_mode);
 }
 void euler_method(void) {  // typical execution time ~45 us
-	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle);
-	register uint16_t pos_diff = (AS5600_pos_f64 - raw);  // rotation detection
+	register uint16_t pos_diff = (AS5600_pos_f64 - state.raw_angle);  // rotation detection
 	state.pos.rotation += pos_diff > 2048; state.pos.rotation -= pos_diff < -2048;
 	register double alpha = 1 / ((EULER_TAU / TIM5->CNT) + 1);
-	AS5600_pos_f64 = (raw * alpha) + ((1 - alpha) * AS5600_pos_f64);
+	AS5600_pos_f64 = (state.raw_angle * alpha) + ((1 - alpha) * AS5600_pos_f64);
 	state.vel = (1e6 / TIM5->CNT) * ((uint16_t)AS5600_pos_f64 - state.pos.angle) * AS5600_RAD_CONV;  // rad / s
 	state.pos.angle = (uint16_t)AS5600_pos_f64;
 	TIM5->CNT = 0;
