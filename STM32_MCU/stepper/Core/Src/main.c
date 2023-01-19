@@ -48,10 +48,10 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 void status_parity(void) {
 	state.n_status = ~state.status;
-	state.status_parity = state.status & 1;
-	state.status_parity ^= (state.status >> 1) & 1;
-	state.status_parity ^= (state.status >> 2) & 1;
-	state.status_parity ^= (state.status >> 3) & 1;
+	state.status_parity =	(state.status & 0x1)		^ \
+							((state.status >> 1) & 0x1)	^ \
+							((state.status >> 2) & 0x1)	^ \
+							((state.status >> 3) & 0x1);
 }
 void set_status(uint8_t stat)	{ state.status |= stat;	status_parity(); }
 void reset_status(uint8_t stat)	{ state.status &= ~stat;status_parity(); }

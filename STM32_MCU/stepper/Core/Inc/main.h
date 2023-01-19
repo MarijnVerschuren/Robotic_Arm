@@ -77,7 +77,7 @@ typedef struct {  // uint8_t[32]
 	volatile uint16_t	status: 4;			// status codes
 	volatile uint16_t	n_status: 4;		// ~status
 	volatile uint16_t	status_parity: 1;	// parity for status
-	uint16_t			id : 7;				// reserved until the main controller fills this in
+	uint16_t			id : 7;				// TODO: set this by instruction (init to 0x7f)
 } MCU_State;
 
 

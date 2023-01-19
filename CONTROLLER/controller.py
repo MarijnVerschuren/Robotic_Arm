@@ -21,7 +21,6 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> i
 	data_o = new_CTRL_Handshake(0, *init_args)
 	data_crc = get_CTRL_Handshake_data(data_o)[3]
 	while True:
-		ser.write(bytes([SYNC_BYTE]))  # sync byte
 		ser.write(data_o)
 		if ser.inWaiting() < 6: continue  # no response
 		data_i = get_CTRL_Handshake_data(ser.read(6))
@@ -85,7 +84,6 @@ def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 		
 		return_code = 0
 		while (not return_code & RETURN_FLAGS.OK):
-			ser.write(bytes([SYNC_BYTE]))  # sync byte
 			ser.write(instruction)
 
 			return_code = int.from_bytes(ser.read(1), "little")

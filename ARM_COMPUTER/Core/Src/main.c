@@ -50,12 +50,28 @@
 
 /* USER CODE BEGIN PV */
 //uint8_t RX_data[896];  // 32 instructions
-uart_ibuf* RX_data;
+ibuf_TypeDef* RX_buffer;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+uint8_t validate_handshake(void* data) {
+	return ((CTRL_Handshake*)data)->crc == crc16_dnp(data, offsetof(CTRL_Handshake, crc));
+}
+
+uint8_t validate_MCU_Instruction(void* data) {
+	return ((MCU_Instruction*)data)->crc == crc16_dnp(data, offsetof(MCU_Instruction, crc));
+}
+void correct_status(MCU_State* state) {
+	if (((state->status & 0x1)			^ \
+		((state->status >> 1) & 0x1)	^ \
+		((state->status >> 2) & 0x1)	^ \
+		((state->status >> 3) & 0x1))	^ \
+		state->status_parity) {
+		state->status ^= (state->status & state->n_status);
+	}
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -93,10 +109,10 @@ int main(void)
   MX_SPI1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-	RX_data = new_uart_ibuf(&huart2, 1024);  // starts receiving
+  	  RX_buffer = new_ibuf(&huart2, 1024);  // starts receiving
 
 	// motor_count starts counting from 0
-	uint8_t motor_count = 0;  // TODO: make code to find motor count
+  	  uint8_t motor_count = 0;  // TODO: make code to find motor count
 
 	{  // anonymous scope so that temporary variables are cleaned up
 		uint32_t baud = 9600;  // default baud
@@ -104,16 +120,16 @@ int main(void)
 
 		HANDSHAKE:  // jmp to label in the case baud is changed (redo handshake)
 
-		memset((void*)&init, 0, 6);  // set to 0
-		uint16_t crc = 0xffff;
-
-		while (init.crc != crc) {  // handshake
-			if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
-			if (uart_ibuf_read(RX_data, &init, 6)) { continue; }
-			crc = crc16_dnp(&init, 4);
-		}  // TODO: add CRC error correction
+		while (ibuf_get_struct(
+					RX_buffer,
+					&init,
+					sizeof(CTRL_Handshake),
+					&validate_handshake
+				) & (RETURN_OUT_OF_DATA | RETURN_STRUCT_INVALID)
+			) {}
 
 		init.motor_count = motor_count;  // set motor count and send message back
+		init.crc = crc16_dnp(&init, offsetof(CTRL_Handshake, crc));
 		HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
 
 		if (init.init_0) {}  // TODO: move all motors to their 0 position
@@ -128,7 +144,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	// HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
-	uart_ibuf_reset(RX_data);
+	ibuf_reset(RX_buffer);
 	MCU_Instruction instruction;
 	MCU_State state;
 	uint8_t return_code;
@@ -146,45 +162,20 @@ int main(void)
 
 
 	while (1) {
-		if (uart_ibuf_align(RX_data, SYNC_BYTE)) { continue; }
-		if (uart_ibuf_read(RX_data, &instruction, 32)) { continue; }
+		uint8_t code = ibuf_get_struct(RX_buffer, &instruction, sizeof(MCU_Instruction), &validate_MCU_Instruction);
+		HAL_UART_Transmit(&huart2, &code, 1, 10);
+		if (code & (RETURN_OUT_OF_DATA | RETURN_STRUCT_INVALID)) { continue; }
 
-		return_code = 0;
-		if (instruction.crc != crc16_dnp(&instruction, 30)) {
-			// TODO: error correction
-			// if not fix-able \/
-			return_code |= RETURN_CRC_ERROR;
-			HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
-			continue;  // do not execute instruction
-		}
-		// TODO: check if instruction is valid, and try fixing it
-		// return_code |= RETURN_ERROR;
-		// HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
-		// continue;
-		// if not valid ^
-		// if fixed \/
-		// return_code |= RETURN_ERROR_FIXED;
-		return_code |= RETURN_OK;
-		HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
-
-		// TODO: test this
-		// TODO: make messages more flexible for other motor drivers
 		do {
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
 			HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
 			HAL_Delay(10);  // give mcu time to react
 		} while (HAL_GPIO_ReadPin(CF_0_GPIO_Port, CF_0_Pin));
-		if (instruction.action & OVERRIDE) {
-			HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 0);
-			HAL_Delay(5);  // give mcu time to react
-			HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 1);
-		}
-		if (instruction.action & POLL) {
-			return_code = SYNC_BYTE;
-			HAL_UART_Transmit(&huart2, (uint8_t*)&return_code, 1, 10);
-			HAL_UART_Transmit(&huart2, (uint8_t*)&state, 32, 100);
-		}
+		correct_status(&state);
+		HAL_UART_Transmit(&huart2, (uint8_t*)&state, 32, 100);
+
+		// TODO: edit the action enum<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

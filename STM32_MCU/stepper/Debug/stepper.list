@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  00020070  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00014df4  00000000  00000000  000200a0  2**0
+ 12 .debug_info   00014de3  00000000  00000000  000200a0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 000030c6  00000000  00000000  00034e94  2**0
+ 13 .debug_abbrev 000030aa  00000000  00000000  00034e83  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00001288  00000000  00000000  00037f60  2**3
+ 14 .debug_aranges 00001288  00000000  00000000  00037f30  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00001108  00000000  00000000  000391e8  2**3
+ 15 .debug_ranges 00001108  00000000  00000000  000391b8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00018db6  00000000  00000000  0003a2f0  2**0
+ 16 .debug_macro  00018da4  00000000  00000000  0003a2c0  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   000172d0  00000000  00000000  000530a6  2**0
+ 17 .debug_line   000172d5  00000000  00000000  00053064  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0009b06e  00000000  00000000  0006a376  2**0
+ 18 .debug_str    0009b01f  00000000  00000000  0006a339  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  001053e4  2**0
+ 19 .comment      00000050  00000000  00000000  00105358  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000511c  00000000  00000000  00105434  2**2
+ 20 .debug_frame  00005118  00000000  00000000  001053a8  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -3444,189 +3444,189 @@ void set_motor_setting(MCU_Instruction* instruction) {
 
 08001d30 <euler_method>:
 void euler_method(void) {  // typical execution time ~45 us
- 8001d30:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
+ 8001d30:	e92d 43b0 	stmdb	sp!, {r4, r5, r7, r8, r9, lr}
  8001d34:	af00      	add	r7, sp, #0
-	register uint16_t raw = ACD_RANGE_CONV * (state.raw_angle);
+	register uint16_t pos_diff = (AS5600_pos_f64 - state.raw_angle);  // rotation detection
  8001d36:	4b6c      	ldr	r3, [pc, #432]	; (8001ee8 <euler_method+0x1b8>)
- 8001d38:	8b1b      	ldrh	r3, [r3, #24]
- 8001d3a:	b29e      	uxth	r6, r3
-	register uint16_t pos_diff = (AS5600_pos_f64 - raw);  // rotation detection
+ 8001d38:	e9d3 4500 	ldrd	r4, r5, [r3]
  8001d3c:	4b6b      	ldr	r3, [pc, #428]	; (8001eec <euler_method+0x1bc>)
- 8001d3e:	e9d3 4500 	ldrd	r4, r5, [r3]
- 8001d42:	4633      	mov	r3, r6
- 8001d44:	4618      	mov	r0, r3
- 8001d46:	f7fe fb99 	bl	800047c <__aeabi_i2d>
- 8001d4a:	4602      	mov	r2, r0
- 8001d4c:	460b      	mov	r3, r1
- 8001d4e:	4620      	mov	r0, r4
- 8001d50:	4629      	mov	r1, r5
- 8001d52:	f7fe fa45 	bl	80001e0 <__aeabi_dsub>
- 8001d56:	4602      	mov	r2, r0
- 8001d58:	460b      	mov	r3, r1
- 8001d5a:	4610      	mov	r0, r2
- 8001d5c:	4619      	mov	r1, r3
- 8001d5e:	f7fe fe91 	bl	8000a84 <__aeabi_d2uiz>
- 8001d62:	4603      	mov	r3, r0
- 8001d64:	b29c      	uxth	r4, r3
+ 8001d3e:	8b1b      	ldrh	r3, [r3, #24]
+ 8001d40:	b29b      	uxth	r3, r3
+ 8001d42:	4618      	mov	r0, r3
+ 8001d44:	f7fe fb9a 	bl	800047c <__aeabi_i2d>
+ 8001d48:	4602      	mov	r2, r0
+ 8001d4a:	460b      	mov	r3, r1
+ 8001d4c:	4620      	mov	r0, r4
+ 8001d4e:	4629      	mov	r1, r5
+ 8001d50:	f7fe fa46 	bl	80001e0 <__aeabi_dsub>
+ 8001d54:	4602      	mov	r2, r0
+ 8001d56:	460b      	mov	r3, r1
+ 8001d58:	4610      	mov	r0, r2
+ 8001d5a:	4619      	mov	r1, r3
+ 8001d5c:	f7fe fe92 	bl	8000a84 <__aeabi_d2uiz>
+ 8001d60:	4603      	mov	r3, r0
+ 8001d62:	b29c      	uxth	r4, r3
 	state.pos.rotation += pos_diff > 2048; state.pos.rotation -= pos_diff < -2048;
- 8001d66:	4b60      	ldr	r3, [pc, #384]	; (8001ee8 <euler_method+0x1b8>)
- 8001d68:	691b      	ldr	r3, [r3, #16]
- 8001d6a:	f343 0313 	sbfx	r3, r3, #0, #20
- 8001d6e:	461a      	mov	r2, r3
- 8001d70:	f5b4 6f00 	cmp.w	r4, #2048	; 0x800
- 8001d74:	bf8c      	ite	hi
- 8001d76:	2301      	movhi	r3, #1
- 8001d78:	2300      	movls	r3, #0
- 8001d7a:	b2db      	uxtb	r3, r3
- 8001d7c:	4413      	add	r3, r2
- 8001d7e:	031a      	lsls	r2, r3, #12
- 8001d80:	1312      	asrs	r2, r2, #12
- 8001d82:	4959      	ldr	r1, [pc, #356]	; (8001ee8 <euler_method+0x1b8>)
- 8001d84:	690b      	ldr	r3, [r1, #16]
- 8001d86:	f362 0313 	bfi	r3, r2, #0, #20
- 8001d8a:	610b      	str	r3, [r1, #16]
- 8001d8c:	4b56      	ldr	r3, [pc, #344]	; (8001ee8 <euler_method+0x1b8>)
- 8001d8e:	691b      	ldr	r3, [r3, #16]
- 8001d90:	f343 0113 	sbfx	r1, r3, #0, #20
- 8001d94:	4a54      	ldr	r2, [pc, #336]	; (8001ee8 <euler_method+0x1b8>)
- 8001d96:	6913      	ldr	r3, [r2, #16]
- 8001d98:	f361 0313 	bfi	r3, r1, #0, #20
- 8001d9c:	6113      	str	r3, [r2, #16]
+ 8001d64:	4b61      	ldr	r3, [pc, #388]	; (8001eec <euler_method+0x1bc>)
+ 8001d66:	691b      	ldr	r3, [r3, #16]
+ 8001d68:	f343 0313 	sbfx	r3, r3, #0, #20
+ 8001d6c:	461a      	mov	r2, r3
+ 8001d6e:	f5b4 6f00 	cmp.w	r4, #2048	; 0x800
+ 8001d72:	bf8c      	ite	hi
+ 8001d74:	2301      	movhi	r3, #1
+ 8001d76:	2300      	movls	r3, #0
+ 8001d78:	b2db      	uxtb	r3, r3
+ 8001d7a:	4413      	add	r3, r2
+ 8001d7c:	031a      	lsls	r2, r3, #12
+ 8001d7e:	1312      	asrs	r2, r2, #12
+ 8001d80:	495a      	ldr	r1, [pc, #360]	; (8001eec <euler_method+0x1bc>)
+ 8001d82:	690b      	ldr	r3, [r1, #16]
+ 8001d84:	f362 0313 	bfi	r3, r2, #0, #20
+ 8001d88:	610b      	str	r3, [r1, #16]
+ 8001d8a:	4b58      	ldr	r3, [pc, #352]	; (8001eec <euler_method+0x1bc>)
+ 8001d8c:	691b      	ldr	r3, [r3, #16]
+ 8001d8e:	f343 0113 	sbfx	r1, r3, #0, #20
+ 8001d92:	4a56      	ldr	r2, [pc, #344]	; (8001eec <euler_method+0x1bc>)
+ 8001d94:	6913      	ldr	r3, [r2, #16]
+ 8001d96:	f361 0313 	bfi	r3, r1, #0, #20
+ 8001d9a:	6113      	str	r3, [r2, #16]
 	register double alpha = 1 / ((EULER_TAU / TIM5->CNT) + 1);
- 8001d9e:	4b54      	ldr	r3, [pc, #336]	; (8001ef0 <euler_method+0x1c0>)
- 8001da0:	6a5b      	ldr	r3, [r3, #36]	; 0x24
- 8001da2:	4618      	mov	r0, r3
- 8001da4:	f7fe fb5a 	bl	800045c <__aeabi_ui2d>
- 8001da8:	4602      	mov	r2, r0
- 8001daa:	460b      	mov	r3, r1
- 8001dac:	a148      	add	r1, pc, #288	; (adr r1, 8001ed0 <euler_method+0x1a0>)
- 8001dae:	e9d1 0100 	ldrd	r0, r1, [r1]
- 8001db2:	f7fe fcf7 	bl	80007a4 <__aeabi_ddiv>
- 8001db6:	4602      	mov	r2, r0
- 8001db8:	460b      	mov	r3, r1
- 8001dba:	4610      	mov	r0, r2
- 8001dbc:	4619      	mov	r1, r3
- 8001dbe:	f04f 0200 	mov.w	r2, #0
- 8001dc2:	4b4c      	ldr	r3, [pc, #304]	; (8001ef4 <euler_method+0x1c4>)
- 8001dc4:	f7fe fa0e 	bl	80001e4 <__adddf3>
- 8001dc8:	4602      	mov	r2, r0
- 8001dca:	460b      	mov	r3, r1
- 8001dcc:	f04f 0000 	mov.w	r0, #0
- 8001dd0:	4948      	ldr	r1, [pc, #288]	; (8001ef4 <euler_method+0x1c4>)
- 8001dd2:	f7fe fce7 	bl	80007a4 <__aeabi_ddiv>
- 8001dd6:	4602      	mov	r2, r0
- 8001dd8:	460b      	mov	r3, r1
- 8001dda:	4614      	mov	r4, r2
- 8001ddc:	461d      	mov	r5, r3
-	AS5600_pos_f64 = (raw * alpha) + ((1 - alpha) * AS5600_pos_f64);
- 8001dde:	4633      	mov	r3, r6
- 8001de0:	4618      	mov	r0, r3
- 8001de2:	f7fe fb4b 	bl	800047c <__aeabi_i2d>
- 8001de6:	4602      	mov	r2, r0
- 8001de8:	460b      	mov	r3, r1
- 8001dea:	4620      	mov	r0, r4
- 8001dec:	4629      	mov	r1, r5
- 8001dee:	f7fe fbaf 	bl	8000550 <__aeabi_dmul>
- 8001df2:	4602      	mov	r2, r0
- 8001df4:	460b      	mov	r3, r1
- 8001df6:	4690      	mov	r8, r2
- 8001df8:	4699      	mov	r9, r3
- 8001dfa:	4622      	mov	r2, r4
- 8001dfc:	462b      	mov	r3, r5
- 8001dfe:	f04f 0000 	mov.w	r0, #0
- 8001e02:	493c      	ldr	r1, [pc, #240]	; (8001ef4 <euler_method+0x1c4>)
- 8001e04:	f7fe f9ec 	bl	80001e0 <__aeabi_dsub>
- 8001e08:	4602      	mov	r2, r0
- 8001e0a:	460b      	mov	r3, r1
- 8001e0c:	4610      	mov	r0, r2
- 8001e0e:	4619      	mov	r1, r3
- 8001e10:	4b36      	ldr	r3, [pc, #216]	; (8001eec <euler_method+0x1bc>)
- 8001e12:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8001e16:	f7fe fb9b 	bl	8000550 <__aeabi_dmul>
- 8001e1a:	4602      	mov	r2, r0
- 8001e1c:	460b      	mov	r3, r1
- 8001e1e:	4640      	mov	r0, r8
- 8001e20:	4649      	mov	r1, r9
- 8001e22:	f7fe f9df 	bl	80001e4 <__adddf3>
- 8001e26:	4602      	mov	r2, r0
- 8001e28:	460b      	mov	r3, r1
- 8001e2a:	4930      	ldr	r1, [pc, #192]	; (8001eec <euler_method+0x1bc>)
- 8001e2c:	e9c1 2300 	strd	r2, r3, [r1]
+ 8001d9c:	4b54      	ldr	r3, [pc, #336]	; (8001ef0 <euler_method+0x1c0>)
+ 8001d9e:	6a5b      	ldr	r3, [r3, #36]	; 0x24
+ 8001da0:	4618      	mov	r0, r3
+ 8001da2:	f7fe fb5b 	bl	800045c <__aeabi_ui2d>
+ 8001da6:	4602      	mov	r2, r0
+ 8001da8:	460b      	mov	r3, r1
+ 8001daa:	a149      	add	r1, pc, #292	; (adr r1, 8001ed0 <euler_method+0x1a0>)
+ 8001dac:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 8001db0:	f7fe fcf8 	bl	80007a4 <__aeabi_ddiv>
+ 8001db4:	4602      	mov	r2, r0
+ 8001db6:	460b      	mov	r3, r1
+ 8001db8:	4610      	mov	r0, r2
+ 8001dba:	4619      	mov	r1, r3
+ 8001dbc:	f04f 0200 	mov.w	r2, #0
+ 8001dc0:	4b4c      	ldr	r3, [pc, #304]	; (8001ef4 <euler_method+0x1c4>)
+ 8001dc2:	f7fe fa0f 	bl	80001e4 <__adddf3>
+ 8001dc6:	4602      	mov	r2, r0
+ 8001dc8:	460b      	mov	r3, r1
+ 8001dca:	f04f 0000 	mov.w	r0, #0
+ 8001dce:	4949      	ldr	r1, [pc, #292]	; (8001ef4 <euler_method+0x1c4>)
+ 8001dd0:	f7fe fce8 	bl	80007a4 <__aeabi_ddiv>
+ 8001dd4:	4602      	mov	r2, r0
+ 8001dd6:	460b      	mov	r3, r1
+ 8001dd8:	4614      	mov	r4, r2
+ 8001dda:	461d      	mov	r5, r3
+	AS5600_pos_f64 = (state.raw_angle * alpha) + ((1 - alpha) * AS5600_pos_f64);
+ 8001ddc:	4b43      	ldr	r3, [pc, #268]	; (8001eec <euler_method+0x1bc>)
+ 8001dde:	8b1b      	ldrh	r3, [r3, #24]
+ 8001de0:	b29b      	uxth	r3, r3
+ 8001de2:	4618      	mov	r0, r3
+ 8001de4:	f7fe fb4a 	bl	800047c <__aeabi_i2d>
+ 8001de8:	4602      	mov	r2, r0
+ 8001dea:	460b      	mov	r3, r1
+ 8001dec:	4620      	mov	r0, r4
+ 8001dee:	4629      	mov	r1, r5
+ 8001df0:	f7fe fbae 	bl	8000550 <__aeabi_dmul>
+ 8001df4:	4602      	mov	r2, r0
+ 8001df6:	460b      	mov	r3, r1
+ 8001df8:	4690      	mov	r8, r2
+ 8001dfa:	4699      	mov	r9, r3
+ 8001dfc:	4622      	mov	r2, r4
+ 8001dfe:	462b      	mov	r3, r5
+ 8001e00:	f04f 0000 	mov.w	r0, #0
+ 8001e04:	493b      	ldr	r1, [pc, #236]	; (8001ef4 <euler_method+0x1c4>)
+ 8001e06:	f7fe f9eb 	bl	80001e0 <__aeabi_dsub>
+ 8001e0a:	4602      	mov	r2, r0
+ 8001e0c:	460b      	mov	r3, r1
+ 8001e0e:	4610      	mov	r0, r2
+ 8001e10:	4619      	mov	r1, r3
+ 8001e12:	4b35      	ldr	r3, [pc, #212]	; (8001ee8 <euler_method+0x1b8>)
+ 8001e14:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001e18:	f7fe fb9a 	bl	8000550 <__aeabi_dmul>
+ 8001e1c:	4602      	mov	r2, r0
+ 8001e1e:	460b      	mov	r3, r1
+ 8001e20:	4640      	mov	r0, r8
+ 8001e22:	4649      	mov	r1, r9
+ 8001e24:	f7fe f9de 	bl	80001e4 <__adddf3>
+ 8001e28:	4602      	mov	r2, r0
+ 8001e2a:	460b      	mov	r3, r1
+ 8001e2c:	492e      	ldr	r1, [pc, #184]	; (8001ee8 <euler_method+0x1b8>)
+ 8001e2e:	e9c1 2300 	strd	r2, r3, [r1]
 	state.vel = (1e6 / TIM5->CNT) * ((uint16_t)AS5600_pos_f64 - state.pos.angle) * AS5600_RAD_CONV;  // rad / s
- 8001e30:	4b2f      	ldr	r3, [pc, #188]	; (8001ef0 <euler_method+0x1c0>)
- 8001e32:	6a5b      	ldr	r3, [r3, #36]	; 0x24
- 8001e34:	4618      	mov	r0, r3
- 8001e36:	f7fe fb11 	bl	800045c <__aeabi_ui2d>
- 8001e3a:	4602      	mov	r2, r0
- 8001e3c:	460b      	mov	r3, r1
- 8001e3e:	a126      	add	r1, pc, #152	; (adr r1, 8001ed8 <euler_method+0x1a8>)
- 8001e40:	e9d1 0100 	ldrd	r0, r1, [r1]
- 8001e44:	f7fe fcae 	bl	80007a4 <__aeabi_ddiv>
- 8001e48:	4602      	mov	r2, r0
- 8001e4a:	460b      	mov	r3, r1
- 8001e4c:	4614      	mov	r4, r2
- 8001e4e:	461d      	mov	r5, r3
- 8001e50:	4b26      	ldr	r3, [pc, #152]	; (8001eec <euler_method+0x1bc>)
- 8001e52:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8001e56:	4610      	mov	r0, r2
- 8001e58:	4619      	mov	r1, r3
- 8001e5a:	f7fe fe13 	bl	8000a84 <__aeabi_d2uiz>
- 8001e5e:	4603      	mov	r3, r0
- 8001e60:	b29b      	uxth	r3, r3
- 8001e62:	461a      	mov	r2, r3
- 8001e64:	4b20      	ldr	r3, [pc, #128]	; (8001ee8 <euler_method+0x1b8>)
- 8001e66:	691b      	ldr	r3, [r3, #16]
- 8001e68:	f3c3 530b 	ubfx	r3, r3, #20, #12
- 8001e6c:	b29b      	uxth	r3, r3
- 8001e6e:	1ad3      	subs	r3, r2, r3
- 8001e70:	4618      	mov	r0, r3
- 8001e72:	f7fe fb03 	bl	800047c <__aeabi_i2d>
- 8001e76:	4602      	mov	r2, r0
- 8001e78:	460b      	mov	r3, r1
- 8001e7a:	4620      	mov	r0, r4
- 8001e7c:	4629      	mov	r1, r5
- 8001e7e:	f7fe fb67 	bl	8000550 <__aeabi_dmul>
- 8001e82:	4602      	mov	r2, r0
- 8001e84:	460b      	mov	r3, r1
- 8001e86:	4610      	mov	r0, r2
- 8001e88:	4619      	mov	r1, r3
- 8001e8a:	a315      	add	r3, pc, #84	; (adr r3, 8001ee0 <euler_method+0x1b0>)
- 8001e8c:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8001e90:	f7fe fb5e 	bl	8000550 <__aeabi_dmul>
- 8001e94:	4602      	mov	r2, r0
- 8001e96:	460b      	mov	r3, r1
- 8001e98:	4913      	ldr	r1, [pc, #76]	; (8001ee8 <euler_method+0x1b8>)
- 8001e9a:	e9c1 2300 	strd	r2, r3, [r1]
+ 8001e32:	4b2f      	ldr	r3, [pc, #188]	; (8001ef0 <euler_method+0x1c0>)
+ 8001e34:	6a5b      	ldr	r3, [r3, #36]	; 0x24
+ 8001e36:	4618      	mov	r0, r3
+ 8001e38:	f7fe fb10 	bl	800045c <__aeabi_ui2d>
+ 8001e3c:	4602      	mov	r2, r0
+ 8001e3e:	460b      	mov	r3, r1
+ 8001e40:	a125      	add	r1, pc, #148	; (adr r1, 8001ed8 <euler_method+0x1a8>)
+ 8001e42:	e9d1 0100 	ldrd	r0, r1, [r1]
+ 8001e46:	f7fe fcad 	bl	80007a4 <__aeabi_ddiv>
+ 8001e4a:	4602      	mov	r2, r0
+ 8001e4c:	460b      	mov	r3, r1
+ 8001e4e:	4614      	mov	r4, r2
+ 8001e50:	461d      	mov	r5, r3
+ 8001e52:	4b25      	ldr	r3, [pc, #148]	; (8001ee8 <euler_method+0x1b8>)
+ 8001e54:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001e58:	4610      	mov	r0, r2
+ 8001e5a:	4619      	mov	r1, r3
+ 8001e5c:	f7fe fe12 	bl	8000a84 <__aeabi_d2uiz>
+ 8001e60:	4603      	mov	r3, r0
+ 8001e62:	b29b      	uxth	r3, r3
+ 8001e64:	461a      	mov	r2, r3
+ 8001e66:	4b21      	ldr	r3, [pc, #132]	; (8001eec <euler_method+0x1bc>)
+ 8001e68:	691b      	ldr	r3, [r3, #16]
+ 8001e6a:	f3c3 530b 	ubfx	r3, r3, #20, #12
+ 8001e6e:	b29b      	uxth	r3, r3
+ 8001e70:	1ad3      	subs	r3, r2, r3
+ 8001e72:	4618      	mov	r0, r3
+ 8001e74:	f7fe fb02 	bl	800047c <__aeabi_i2d>
+ 8001e78:	4602      	mov	r2, r0
+ 8001e7a:	460b      	mov	r3, r1
+ 8001e7c:	4620      	mov	r0, r4
+ 8001e7e:	4629      	mov	r1, r5
+ 8001e80:	f7fe fb66 	bl	8000550 <__aeabi_dmul>
+ 8001e84:	4602      	mov	r2, r0
+ 8001e86:	460b      	mov	r3, r1
+ 8001e88:	4610      	mov	r0, r2
+ 8001e8a:	4619      	mov	r1, r3
+ 8001e8c:	a314      	add	r3, pc, #80	; (adr r3, 8001ee0 <euler_method+0x1b0>)
+ 8001e8e:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001e92:	f7fe fb5d 	bl	8000550 <__aeabi_dmul>
+ 8001e96:	4602      	mov	r2, r0
+ 8001e98:	460b      	mov	r3, r1
+ 8001e9a:	4914      	ldr	r1, [pc, #80]	; (8001eec <euler_method+0x1bc>)
+ 8001e9c:	e9c1 2300 	strd	r2, r3, [r1]
 	state.pos.angle = (uint16_t)AS5600_pos_f64;
- 8001e9e:	4b13      	ldr	r3, [pc, #76]	; (8001eec <euler_method+0x1bc>)
- 8001ea0:	e9d3 2300 	ldrd	r2, r3, [r3]
- 8001ea4:	4610      	mov	r0, r2
- 8001ea6:	4619      	mov	r1, r3
- 8001ea8:	f7fe fdec 	bl	8000a84 <__aeabi_d2uiz>
- 8001eac:	4603      	mov	r3, r0
- 8001eae:	b29b      	uxth	r3, r3
- 8001eb0:	f3c3 030b 	ubfx	r3, r3, #0, #12
- 8001eb4:	b299      	uxth	r1, r3
- 8001eb6:	4a0c      	ldr	r2, [pc, #48]	; (8001ee8 <euler_method+0x1b8>)
- 8001eb8:	6913      	ldr	r3, [r2, #16]
- 8001eba:	f361 531f 	bfi	r3, r1, #20, #12
- 8001ebe:	6113      	str	r3, [r2, #16]
+ 8001ea0:	4b11      	ldr	r3, [pc, #68]	; (8001ee8 <euler_method+0x1b8>)
+ 8001ea2:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001ea6:	4610      	mov	r0, r2
+ 8001ea8:	4619      	mov	r1, r3
+ 8001eaa:	f7fe fdeb 	bl	8000a84 <__aeabi_d2uiz>
+ 8001eae:	4603      	mov	r3, r0
+ 8001eb0:	b29b      	uxth	r3, r3
+ 8001eb2:	f3c3 030b 	ubfx	r3, r3, #0, #12
+ 8001eb6:	b299      	uxth	r1, r3
+ 8001eb8:	4a0c      	ldr	r2, [pc, #48]	; (8001eec <euler_method+0x1bc>)
+ 8001eba:	6913      	ldr	r3, [r2, #16]
+ 8001ebc:	f361 531f 	bfi	r3, r1, #20, #12
+ 8001ec0:	6113      	str	r3, [r2, #16]
 	TIM5->CNT = 0;
- 8001ec0:	4b0b      	ldr	r3, [pc, #44]	; (8001ef0 <euler_method+0x1c0>)
- 8001ec2:	2200      	movs	r2, #0
- 8001ec4:	625a      	str	r2, [r3, #36]	; 0x24
+ 8001ec2:	4b0b      	ldr	r3, [pc, #44]	; (8001ef0 <euler_method+0x1c0>)
+ 8001ec4:	2200      	movs	r2, #0
+ 8001ec6:	625a      	str	r2, [r3, #36]	; 0x24
 }  // TODO: integrate vel and acc <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
- 8001ec6:	bf00      	nop
- 8001ec8:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
- 8001ecc:	f3af 8000 	nop.w
+ 8001ec8:	bf00      	nop
+ 8001eca:	e8bd 83b0 	ldmia.w	sp!, {r4, r5, r7, r8, r9, pc}
+ 8001ece:	bf00      	nop
  8001ed0:	66666666 	.word	0x66666666
  8001ed4:	40026666 	.word	0x40026666
  8001ed8:	00000000 	.word	0x00000000
  8001edc:	412e8480 	.word	0x412e8480
  8001ee0:	5798a5fb 	.word	0x5798a5fb
  8001ee4:	3f5921fb 	.word	0x3f5921fb
- 8001ee8:	20000188 	.word	0x20000188
- 8001eec:	200001f8 	.word	0x200001f8
+ 8001ee8:	200001f8 	.word	0x200001f8
+ 8001eec:	20000188 	.word	0x20000188
  8001ef0:	40000c00 	.word	0x40000c00
  8001ef4:	3ff00000 	.word	0x3ff00000
 

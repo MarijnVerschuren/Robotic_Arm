@@ -45,40 +45,27 @@ typedef enum {
 	SYNC = 0x04,
 	POLL = 0x08
 } ACTION_FLAGS;
-
-/* RETURN_CODES
- * message sent back to PC to tell it how instructions are received
- */
-// 0x1f
-typedef enum {
-	RETURN_OK = 0x01,
-	RETURN_CRC_FIXED = 0x02,
-	RETURN_CRC_ERROR = 0x04,
-	RETURN_ERROR_FIXED = 0x08,  // fixed invalid instruction
-	RETURN_ERROR = 0x10
-} RETURN_FLAGS;
-
 /* State
  * state of the MCU
  */
 // 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
 typedef struct {  // uint8_t[32]
-	double				vel;
-	double				acc;
-	struct {  // +- 188,744,040 deg
+	volatile double		vel;
+	volatile double		acc;
+	volatile struct {  // +- 188,744,040 deg
 		int32_t			rotation: 20;
 		uint32_t		angle: 12;
 	}					pos, target;
-	uint16_t			raw_angle;
-	uint16_t			instrution_id;	// instruction id which is currently being executed
-	uint16_t			micro_step: 2;  // microstep setting
-	uint16_t			srd_mode: 1;	// srd mode on the motor controller
-	uint16_t			id : 7;			// reserved until the main controller fills this in
-	uint16_t			lock: 1;		// this prevents the MCU from loading the next instruction
-	uint16_t			_ : 5;			// reserved
-	uint8_t				queue_size;		// amount of instructions that are queued
-	uint8_t				queue_index;	// current index wich is being excecuted
-
+	volatile uint16_t	raw_angle;
+	uint16_t			instrution_id;		// instruction id which is currently being executed
+	uint16_t			micro_step: 2;  	// microstep setting
+	uint16_t			srd_mode: 1;		// srd mode on the motor controller
+	volatile uint16_t	queue_size: 13;		// allows up to 8192 instructions in queue
+	// lots of parity for status
+	volatile uint16_t	status: 4;			// status codes
+	volatile uint16_t	n_status: 4;		// ~status
+	volatile uint16_t	status_parity: 1;	// parity for status
+	uint16_t			id : 7;				// reserved until the main controller fills this in
 } MCU_State;
 
 /* Instruction
@@ -130,6 +117,9 @@ typedef struct {  // uint8_t[6]
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+extern uint8_t validate_handshake(void*);
+extern uint8_t validate_MCU_Instruction(void*);
+extern uint8_t get_status(MCU_State* state);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
