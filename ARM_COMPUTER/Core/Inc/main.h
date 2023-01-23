@@ -45,27 +45,28 @@ typedef enum {
 	SYNC = 0x04,
 	POLL = 0x08
 } ACTION_FLAGS;
+
 /* State
  * state of the MCU
  */
 // 0xffffffffffffffff 0xffffffffffffffff 0xffffffff 0xffffffff 0xffff 0xffff 0xff 0xff 0xff 0xff
 typedef struct {  // uint8_t[32]
-	volatile double		vel;
-	volatile double		acc;
-	volatile struct {  // +- 188,744,040 deg
-		int32_t			rotation: 20;
-		uint32_t		angle: 12;
-	}					pos, target;
-	volatile uint16_t	raw_angle;
-	uint16_t			instrution_id;		// instruction id which is currently being executed
-	uint16_t			micro_step: 2;  	// microstep setting
-	uint16_t			srd_mode: 1;		// srd mode on the motor controller
-	volatile uint16_t	queue_size: 13;		// allows up to 8192 instructions in queue
+	double			vel;
+	double			acc;
+	struct {  // +- 188,744,040 deg
+		int32_t		rotation: 20;
+		uint32_t	angle: 12;
+	}				pos, target;
+	uint16_t		raw_angle;
+	uint16_t		instrution_id;		// instruction id which is currently being executed
+	uint16_t		micro_step: 2;  	// microstep setting
+	uint16_t		srd_mode: 1;		// srd mode on the motor controller
+	uint16_t		queue_size: 13;		// allows up to 8192 instructions in queue
 	// lots of parity for status
-	volatile uint16_t	status: 4;			// status codes
-	volatile uint16_t	n_status: 4;		// ~status
-	volatile uint16_t	status_parity: 1;	// parity for status
-	uint16_t			id : 7;				// reserved until the main controller fills this in
+	uint16_t		status: 4;			// status codes
+	uint16_t		n_status: 4;		// ~status
+	uint16_t		status_parity: 1;	// parity for status
+	uint16_t		id : 7;				// reserved until the main controller fills this in
 } MCU_State;
 
 /* Instruction
@@ -78,11 +79,11 @@ typedef struct {  // uint8_t[32]
 	double		max_acc;		// rad / s^2
 	uint16_t	micro_step: 2;  // microstep setting
 	uint16_t	srd_mode: 1;	// srd mode on the motor controller
-	uint16_t	action: 4;		// look in ACTION enum for possible actions
-	uint16_t	dir: 2;			// 0 CLOSEST, 1 CW, 2 CCW, 3 LONGEST
+	uint16_t	action: 4;		// look in ACTION enum for possible actions  // TODO: rethink and implement
+	uint16_t	_: 2;
 	uint16_t	id: 7;			// selected motor
 	uint16_t	instrution_id;	// instruction id
-	uint16_t	_;				// reserved uint8_t[2]
+	uint16_t	__;				// reserved uint8_t[2]
 	uint16_t	crc;
 } MCU_Instruction;
 
@@ -91,15 +92,12 @@ typedef struct {  // uint8_t[32]
  * it deliberatly has no error checking so that unstable connections are not accepted
  * to establish a successfull connection the received data is just sent back to the mcu with some flags set to preform init actions
  */
-// ((0x1f, 0x20, 0xffffffc) => 0xffffffff, 0xffff
-typedef struct {  // uint8_t[6]
-	uint32_t motor_count: 5;	// = max motor id (starts counting from 0)
-	uint32_t init_0: 1;			// make mcu initialize the motors to their 0 position
-	// set baud rate after handshake
-	// first handshake is always done with 9600 baud
-	// after change handshake will have to be established again
-	// https://community.st.com/s/question/0D53W00001GkPvRSAV/is-it-possible-to-change-the-baud-rate-of-the-usart-during-run-time-in-stm32-cube-ide
-	uint32_t baud: 26;
+// 0xffffffff ((0xfe 0x1 0xff) => 0xffff) 0xffff
+typedef struct {  // uint8_t[8]
+	uint32_t baud;				// TODO: switch baud on the go
+	uint16_t motor_count: 7;	// = max motor id (starts counting from 0)
+	uint16_t init_0: 1;			// make mcu initialize the motors to their 0 position
+	uint16_t _: 8;				// reserved because this struct is minimally 8 bytes
 	uint16_t crc;
 } CTRL_Handshake;  // control handshake
 /* USER CODE END ET */

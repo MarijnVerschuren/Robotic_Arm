@@ -26,10 +26,11 @@ typedef enum {
 
 typedef struct {
 	uint8_t* buffer;
+	uint8_t* buffer_end;
 	UART_HandleTypeDef* uart_handle;
-	volatile uint32_t* end;  // where the uart peripheral is writing
-	uint32_t size;
+	volatile uint32_t* write;  // where the uart peripheral is writing
 	uint32_t read;
+	uint32_t size;
 } ibuf_TypeDef;
 
 

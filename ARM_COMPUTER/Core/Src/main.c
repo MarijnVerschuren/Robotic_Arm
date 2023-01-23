@@ -130,7 +130,7 @@ int main(void)
 
 		init.motor_count = motor_count;  // set motor count and send message back
 		init.crc = crc16_dnp(&init, offsetof(CTRL_Handshake, crc));
-		HAL_UART_Transmit(&huart2, (uint8_t*)&init, 6, 10);
+		HAL_UART_Transmit(&huart2, (uint8_t*)&init, sizeof(CTRL_Handshake), 10);
 
 		if (init.init_0) {}  // TODO: move all motors to their 0 position
 		if (init.baud != baud) {
@@ -155,7 +155,6 @@ int main(void)
 	instruction.micro_step = 3;
 	instruction.srd_mode = 0;
 	instruction.action = 0xf;  // all
-	instruction.dir = 0;  // fastest
 	instruction.id = 0;
 	instruction.instrution_id = 0;
 	instruction.crc = crc16_dnp(&instruction, 30);

@@ -91,11 +91,11 @@ typedef struct {  // uint8_t[32]
 	double		max_acc;		// rad / s^2
 	uint16_t	micro_step: 2;  // microstep setting
 	uint16_t	srd_mode: 1;	// srd mode on the motor controller
-	uint16_t	action: 4;		// look in ACTION enum for possible actions
-	uint16_t	dir: 2;			// 0 CLOSEST, 1 CW, 2 CCW, 3 LONGEST
+	uint16_t	action: 4;		// look in ACTION enum for possible actions  // TODO: rethink and implement
+	uint16_t	_: 2;
 	uint16_t	id: 7;			// selected motor
 	uint16_t	instrution_id;	// instruction id
-	uint16_t	_;				// reserved uint8_t[2]
+	uint16_t	__;				// reserved uint8_t[2]
 	uint16_t	crc;
 } MCU_Instruction;
 /* USER CODE END ET */

@@ -17,14 +17,17 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> i
 
 	ser.reset_input_buffer()
 	ser.reset_output_buffer()
-
+	
 	data_o = new_CTRL_Handshake(0, *init_args)
 	data_crc = get_CTRL_Handshake_data(data_o)[3]
+
 	while True:
 		ser.write(data_o)
-		if ser.inWaiting() < 6: continue  # no response
-		data_i = get_CTRL_Handshake_data(ser.read(6))
-		if data_i[1:3] == init_args and data_i[3] == data_crc:
+		if ser.inWaiting() < 8: time.sleep(0.2); continue  # no response
+		raw_i = ser.read(8)
+		data_i = get_CTRL_Handshake_data(raw_i)
+		print(data_i, raw_i)
+		if data_i[1:3] == init_args:  # todo: check crc
 			if init_args[1] != baud: return init(adapter, *init_args, baud = init_args[1])
 			return data_i[0]  # motor_count
 
@@ -68,18 +71,9 @@ def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 			sep="\n"
 		)
 		action = eval(input(": "))
-		print(
-			"dir:",
-			"\t(0) -> closest",
-			"\t(1) -> CW",
-			"\t(2) -> CCW",
-			"\t(3) -> longest",
-			sep="\n"
-		)
-		dir = int(input(": "))
 
 		motor_id = int(input(f"motor_id (0 to {motor_count}): "))
-		instruction, instruction_id = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode, dir)
+		instruction, instruction_id = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
 		print(instruction, instruction_id)
 		
 		return_code = 0

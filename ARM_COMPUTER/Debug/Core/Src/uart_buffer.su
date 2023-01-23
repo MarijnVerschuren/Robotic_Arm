@@ -1,5 +1,5 @@
 ../Core/Src/uart_buffer.c:13:15:new_ibuf	24	static
-../Core/Src/uart_buffer.c:24:6:ibuf_reset	16	static
-../Core/Src/uart_buffer.c:30:9:ibuf_buffered	16	static
-../Core/Src/uart_buffer.c:39:9:ibuf_get	40	static
-../Core/Src/uart_buffer.c:52:9:ibuf_get_struct	32	static
+../Core/Src/uart_buffer.c:25:6:ibuf_reset	16	static
+../Core/Src/uart_buffer.c:31:9:ibuf_buffered	24	static
+../Core/Src/uart_buffer.c:41:9:ibuf_get	40	static
+../Core/Src/uart_buffer.c:58:9:ibuf_get_struct	32	static

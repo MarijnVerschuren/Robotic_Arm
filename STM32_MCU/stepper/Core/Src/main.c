@@ -142,7 +142,6 @@ int main(void)
 	instruction.micro_step = 3;
 	instruction.srd_mode = 1;
 	instruction.action = 0xf;
-	instruction.dir = 0;
 	instruction.id = 0;
 	instruction.instrution_id = 0;
 	// </TEST>
