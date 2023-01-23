@@ -50,29 +50,12 @@ def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 		input("send: ")
 		# make instruction
 		target = float(input("target (f64, rad): "))
-		max_vel = float(input("max_vel (f64, rad / s): "))
-		max_acc = float(input("max_acc (f64, rad / s^2): "))
-		print(
-			"microstep:",
-			"\t(0) -> MS2",
-			"\t(1) -> MS4",
-			"\t(2) -> MS8",
-			"\t(3) -> MS16",
-			sep="\n"
-		)
-		micro_step = int(input(": "))
-		srd_mode = int(input("srd_mode (1 or 0): "))
-		print(
-			"action (+ to use multiple):",
-			"\t(1) -> EXEC",
-			"\t(2) -> OVERRIDE",
-			"\t(4) -> SYNC",
-			"\t(8) -> POLL",
-			sep="\n"
-		)
-		action = eval(input(": "))
-
-		motor_id = int(input(f"motor_id (0 to {motor_count}): "))
+		max_vel = 10
+		max_acc = 1
+		micro_step = 3
+		srd_mode = 0
+		action = 0xf
+		motor_id = 0#int(input(f"motor_id (0 to {motor_count}): "))
 		instruction, instruction_id = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
 		print(instruction, instruction_id)
 		
