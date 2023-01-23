@@ -132,6 +132,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	// TODO: WWDG ERROR: https://electronics.stackexchange.com/questions/524941/stm32-unexpected-interrupt-causes-program-to-jump-in-infinite-loop
 	status_parity();
 	queue = new_list();
 
@@ -183,7 +184,7 @@ int main(void)
 
 	// enable messages
 	HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)&state, (uint8_t*)&instruction_input, 32);
-
+	while (1) {}
 	// initialize AS5600 sensor
 	set_status(SENSOR_ERROR);
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1);  // set flag and set error code after first fault

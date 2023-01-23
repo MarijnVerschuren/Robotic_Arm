@@ -110,7 +110,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   	  RX_buffer = new_ibuf(&huart2, 1024);  // starts receiving
-
+  	  goto TEST;  // skip handshake for testing
 	// motor_count starts counting from 0
   	  uint8_t motor_count = 0;  // TODO: make code to find motor count
 
@@ -143,6 +143,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	TEST:
 	// HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
 	ibuf_reset(RX_buffer);
 	MCU_Instruction instruction;
@@ -159,6 +160,12 @@ int main(void)
 	instruction.instrution_id = 0;
 	instruction.crc = crc16_dnp(&instruction, 30);
 
+	while(1) {
+		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
+		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
+		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
+		HAL_Delay(1000);
+	}
 
 	while (1) {
 		uint8_t code = ibuf_get_struct(RX_buffer, &instruction, sizeof(MCU_Instruction), &validate_MCU_Instruction);
