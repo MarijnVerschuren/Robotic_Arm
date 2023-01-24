@@ -104,7 +104,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
 
 void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 	// only hspi1 is used so there is no need to check
-	if ((instruction_input.crc != crc16_dnp((uint8_t*)&instruction_input, 30))) { set_status(CRC_ERROR); return; }  // reject instruction if crc does not match
+	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1);
+	if ((instruction_input.crc != crc16_dnp((uint8_t*)&instruction_input, offsetof(MCU_Instruction, crc)))) { set_status(CRC_ERROR); return; }  // reject instruction if crc does not match
 	MCU_Instruction* new = malloc(sizeof(MCU_Instruction));
 	memcpy(new, &instruction_input, sizeof(MCU_Instruction));
 	push(queue, new);  // push to top of queue
@@ -114,11 +115,10 @@ void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi) {
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	// this will not instantly load next instruction
-	if (GPIO_Pin == NSS_Pin) { HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1); }  // set the flag pin until reset from SPI_TxRxCplt callback on success
 	if (GPIO_Pin == INSTUCTION_INT_Pin) {
 		pop(queue);
 		if (!queue->end) { return; }  // do not update instruction so that the position is held
-		memcpy(&instruction, queue->end->data, sizeof(MCU_Instruction));
+		memcpy(&instruction, queue->start->data, sizeof(MCU_Instruction));
 		set_motor_setting(&instruction);
 		step_gain = 0;
 	}
@@ -132,7 +132,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	// TODO: WWDG ERROR: https://electronics.stackexchange.com/questions/524941/stm32-unexpected-interrupt-causes-program-to-jump-in-infinite-loop
+	// TODO: MAKE SPI INPUT BUFFER like uart buffer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	status_parity();
 	queue = new_list();
 
@@ -184,7 +184,7 @@ int main(void)
 
 	// enable messages
 	HAL_SPI_TransmitReceive_DMA(&hspi1, (uint8_t*)&state, (uint8_t*)&instruction_input, 32);
-	while (1) {}
+
 	// initialize AS5600 sensor
 	set_status(SENSOR_ERROR);
 	HAL_GPIO_WritePin(STATUS_PIN_GPIO_Port, STATUS_PIN_Pin, 1);  // set flag and set error code after first fault

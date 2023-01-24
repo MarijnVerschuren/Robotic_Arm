@@ -110,13 +110,12 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   	  RX_buffer = new_ibuf(&huart2, 1024);  // starts receiving
-  	  goto TEST;  // skip handshake for testing
 	// motor_count starts counting from 0
   	  uint8_t motor_count = 0;  // TODO: make code to find motor count
 
 	{  // anonymous scope so that temporary variables are cleaned up
-		uint32_t baud = 9600;  // default baud
-		CTRL_Handshake init;
+		uint32_t baud = 11520;  // default baud
+		CTRL_Handshake init;  // TODO: remove the baud rate compontent. <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 		HANDSHAKE:  // jmp to label in the case baud is changed (redo handshake)
 
@@ -143,7 +142,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	TEST:
 	// HAL_UART_Transmit(&huart2, (uint8_t*)&instruction, 28, 100);  // 10ms timeout is too little!!!!
 	ibuf_reset(RX_buffer);
 	MCU_Instruction instruction;
@@ -160,27 +158,31 @@ int main(void)
 	instruction.instrution_id = 0;
 	instruction.crc = crc16_dnp(&instruction, 30);
 
-	while(1) {
-		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
-		HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
-		HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
-		HAL_Delay(1000);
-	}
-
-	while (1) {
-		uint8_t code = ibuf_get_struct(RX_buffer, &instruction, sizeof(MCU_Instruction), &validate_MCU_Instruction);
+	uint8_t code = RETURN_STRUCT_INVALID;
+	while (1) { LOOP:
+		while (code & (RETURN_OUT_OF_DATA | RETURN_STRUCT_INVALID)) {
+			code = ibuf_get_struct(
+				RX_buffer,
+				&instruction,
+				sizeof(MCU_Instruction),
+				&validate_MCU_Instruction
+			);
+		}
 		HAL_UART_Transmit(&huart2, &code, 1, 10);
-		if (code & (RETURN_OUT_OF_DATA | RETURN_STRUCT_INVALID)) { continue; }
 
+		uint32_t tickstart = HAL_GetTick();
 		do {
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 0);
 			HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)&instruction, (uint8_t*)&state, 32, 100);
 			HAL_GPIO_WritePin(CS_0_GPIO_Port, CS_0_Pin, 1);
-			HAL_Delay(10);  // give mcu time to react
+			HAL_Delay(50);  // give mcu time to react
+			if (HAL_GetTick() - tickstart > 5000) { goto LOOP; }
 		} while (HAL_GPIO_ReadPin(CF_0_GPIO_Port, CF_0_Pin));
+		HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 1);
+		HAL_Delay(100);  // give mcu time to react
+		HAL_GPIO_WritePin(C_INT_GPIO_Port, C_INT_Pin, 0);
 		correct_status(&state);
-		HAL_UART_Transmit(&huart2, (uint8_t*)&state, 32, 100);
-
+		//HAL_UART_Transmit(&huart2, (uint8_t*)&state, 32, 100);
 		// TODO: edit the action enum<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     /* USER CODE END WHILE */
 

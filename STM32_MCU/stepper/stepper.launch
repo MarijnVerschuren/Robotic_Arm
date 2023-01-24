@@ -77,6 +77,6 @@
         <listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
         <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
     </listAttribute>
-    <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;&gt;&lt;gdbmemoryBlockExpression address=&quot;536871248&quot; label=&quot;instruction&quot;/&gt;&lt;gdbmemoryBlockExpression address=&quot;537001984&quot; label=&quot;queue-&amp;gt;start-&amp;gt;data&quot;/&gt;&lt;/memoryBlockExpressionList&gt;"/>
+    <stringAttribute key="org.eclipse.dsf.launch.MEMORY_BLOCKS" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;&lt;memoryBlockExpressionList context=&quot;reserved-for-future-use&quot;&gt;&lt;gdbmemoryBlockExpression address=&quot;536871248&quot; label=&quot;instruction&quot;/&gt;&lt;gdbmemoryBlockExpression address=&quot;537001984&quot; label=&quot;queue-&amp;gt;start-&amp;gt;data&quot;/&gt;&lt;gdbmemoryBlockExpression address=&quot;536871376&quot; label=&quot;&amp;amp;instruction_input&quot;/&gt;&lt;/memoryBlockExpressionList&gt;"/>
     <stringAttribute key="process_factory_id" value="com.st.stm32cube.ide.mcu.debug.launch.HardwareDebugProcessFactory"/>
 </launchConfiguration>

@@ -8,10 +8,10 @@ from lib import *
 
 
 # init_args: (init_0, baud)
-def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> int:
+def init(adapter: str, *init_args, baud: int = 11520, time_out: float = 0.1) -> int:
 	ser = serial.Serial(
 		port=adapter, baudrate=baud, bytesize=serial.EIGHTBITS,
-		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO,
+		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
 		timeout=time_out
 	)
 
@@ -21,7 +21,9 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> i
 	data_o = new_CTRL_Handshake(0, *init_args)
 	data_crc = get_CTRL_Handshake_data(data_o)[3]
 
+	tries = 0
 	while True:
+		tries += 1
 		ser.write(data_o)
 		if ser.inWaiting() < 8: time.sleep(0.2); continue  # no response
 		raw_i = ser.read(8)
@@ -33,12 +35,12 @@ def init(adapter: str, *init_args, baud: int = 9600, time_out: float = 0.1) -> i
 
 
 
-def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
+def run(adapter: str, baud: int = 11520, time_out: float = 0.1) -> None:
 	motor_count = init(adapter, 1, baud)  # init args: init_0=1, baud=baud
 
 	ser = serial.Serial(
 		port=adapter, baudrate=baud, bytesize=serial.EIGHTBITS,
-		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_TWO,
+		parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
 		timeout=time_out
 	)
 
@@ -47,7 +49,6 @@ def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 	ser.reset_output_buffer()
 
 	while True:
-		input("send: ")
 		# make instruction
 		target = float(input("target (f64, rad): "))
 		max_vel = 10
@@ -57,16 +58,20 @@ def run(adapter: str, baud: int = 9600, time_out: float = 0.1) -> None:
 		action = 0xf
 		motor_id = 0#int(input(f"motor_id (0 to {motor_count}): "))
 		instruction, instruction_id = new_MCU_Instruction(motor_id, action, target, max_vel, max_acc, micro_step, srd_mode)
-		print(instruction, instruction_id)
+		print(instruction.hex())
 		
+		tries = 0
 		return_code = 0
 		while (not return_code & RETURN_FLAGS.OK):
 			ser.write(instruction)
-
 			return_code = int.from_bytes(ser.read(1), "little")
-			print(return_code)
+			tries += 1
+		print("tries:", tries)
 
 
+# TODO: <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# TODO: remove baud switching
+# TODO: send move to 0 instructions to init the buffer
 
 
 if __name__ == "__main__":
