@@ -1101,6 +1101,155 @@ Discarded input sections
  .debug_macro   0x0000000000000000       0x16 ./Core/Src/spi.o
  .debug_macro   0x0000000000000000       0x29 ./Core/Src/spi.o
  .debug_macro   0x0000000000000000      0x176 ./Core/Src/spi.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .group         0x0000000000000000        0xc ./Core/Src/spi_buffer.o
+ .text          0x0000000000000000        0x0 ./Core/Src/spi_buffer.o
+ .data          0x0000000000000000        0x0 ./Core/Src/spi_buffer.o
+ .bss           0x0000000000000000        0x0 ./Core/Src/spi_buffer.o
+ .debug_info    0x0000000000000000       0x7d ./Core/Src/spi_buffer.o
+ .debug_abbrev  0x0000000000000000       0x29 ./Core/Src/spi_buffer.o
+ .debug_aranges
+                0x0000000000000000       0x18 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x349 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0xa78 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x1e ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x22 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x4c ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x94 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x3c ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x34 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x16 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x10e ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x8d ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x16 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x43 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x57 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x34 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x10 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x58 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x71 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x1c ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x12a ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x341 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x16 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x29 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x16 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x35 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x20 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x2a7 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x2e ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x28 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x103 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x6a ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x1df ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x1c ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x22 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0xd9 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000     0x102d ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x11f ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000     0xb953 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x6d ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000     0x367e ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x56 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x447 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x9fe ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x115 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x11b ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0xa5 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x15f ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x287 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x5f ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x236 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x9e1 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x38b ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x17d ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0xf9 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x132 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x264 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x2e ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x1b5 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x22 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0xd6 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x11a ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x85 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x89 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x225 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x8e6 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000       0x47 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x126 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x190 ./Core/Src/spi_buffer.o
+ .debug_macro   0x0000000000000000      0x176 ./Core/Src/spi_buffer.o
+ .debug_line    0x0000000000000000      0x8a6 ./Core/Src/spi_buffer.o
+ .debug_str     0x0000000000000000    0x97015 ./Core/Src/spi_buffer.o
+ .comment       0x0000000000000000       0x51 ./Core/Src/spi_buffer.o
+ .ARM.attributes
+                0x0000000000000000       0x34 ./Core/Src/spi_buffer.o
  .group         0x0000000000000000        0xc ./Core/Src/stm32f4xx_hal_msp.o
  .group         0x0000000000000000        0xc ./Core/Src/stm32f4xx_hal_msp.o
  .group         0x0000000000000000        0xc ./Core/Src/stm32f4xx_hal_msp.o
@@ -4773,6 +4922,7 @@ LOAD ./Core/Src/i2c.o
 LOAD ./Core/Src/list.o
 LOAD ./Core/Src/main.o
 LOAD ./Core/Src/spi.o
+LOAD ./Core/Src/spi_buffer.o
 LOAD ./Core/Src/stm32f4xx_hal_msp.o
 LOAD ./Core/Src/stm32f4xx_it.o
 LOAD ./Core/Src/syscalls.o

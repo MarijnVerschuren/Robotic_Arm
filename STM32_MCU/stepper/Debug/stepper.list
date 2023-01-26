@@ -3906,7 +3906,7 @@ int main(void)
  8002130:	b598      	push	{r3, r4, r7, lr}
  8002132:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN 1 */
-	// TODO: WWDG ERROR: https://electronics.stackexchange.com/questions/524941/stm32-unexpected-interrupt-causes-program-to-jump-in-infinite-loop
+	// TODO: MAKE SPI INPUT BUFFER like uart buffer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	status_parity();
  8002134:	f7ff fcfa 	bl	8001b2c <status_parity>
 	queue = new_list();
