@@ -149,7 +149,7 @@ extern uint8_t get_status(MCU_State* state);
 #define CF_5_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
-#define SYNC_BYTE 0x5C
+#define SYNC_BYTE 0xFF
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

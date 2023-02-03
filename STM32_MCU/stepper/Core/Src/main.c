@@ -46,15 +46,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-void status_parity(void) {
-	state.n_status = ~state.status;
-	state.status_parity =	(state.status & 0x1)		^ \
-							((state.status >> 1) & 0x1)	^ \
-							((state.status >> 2) & 0x1)	^ \
-							((state.status >> 3) & 0x1);
-}
-void set_status(uint8_t stat)	{ state.status |= stat;	status_parity(); }
-void reset_status(uint8_t stat)	{ state.status &= ~stat;status_parity(); }
+void set_status(uint8_t stat)	{ state.status |= stat;	}
+void reset_status(uint8_t stat)	{ state.status &= ~stat;}
 
 void delay_us(uint32_t n) { TIM2->CNT = 0; while(TIM2->CNT < n); }
 void until_us(uint32_t n) { while(TIM2->CNT < n); }  // this will wait until the count register is set to a specific value this allows code to be ran while waiting
@@ -133,7 +126,6 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	// TODO: MAKE SPI INPUT BUFFER like uart buffer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	status_parity();
 	queue = new_list();
 
 	// <TEST>  <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -153,32 +145,32 @@ int main(void)
 	sensor->dir_pin = AS5600_DIR_Pin;
 	sensor->positive_rotation_direction = AS5600_DIR_CW;
 	// TODO: test if hysteresis helps with rotation detection stability
-  /* USER CODE END 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
-  /* USER CODE END Init */
+	/* USER CODE BEGIN Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-  /* USER CODE END SysInit */
+	/* USER CODE BEGIN SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_SPI1_Init();
-  MX_I2C1_Init();
-  MX_ADC1_Init();
-  MX_TIM2_Init();
-  MX_TIM5_Init();
-  MX_TIM10_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_DMA_Init();
+	MX_SPI1_Init();
+	MX_I2C1_Init();
+	MX_ADC1_Init();
+	MX_TIM2_Init();
+	MX_TIM5_Init();
+	MX_TIM10_Init();
+	/* USER CODE BEGIN 2 */
 	// disable motor driver
 	HAL_GPIO_WritePin(STEPPER_NEN_GPIO_Port, STEPPER_NEN_Pin, 1);
 

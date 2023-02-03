@@ -75,8 +75,7 @@ typedef struct {  // uint8_t[32]
 	volatile uint16_t	queue_size: 13;		// allows up to 8192 instructions in queue
 	// lots of parity for status
 	volatile uint16_t	status: 4;			// status codes
-	volatile uint16_t	n_status: 4;		// ~status
-	volatile uint16_t	status_parity: 1;	// parity for status
+	uint16_t			_: 5;
 	uint16_t			id : 7;				// TODO: set this by instruction (init to 0x7f)
 } MCU_State;
 
